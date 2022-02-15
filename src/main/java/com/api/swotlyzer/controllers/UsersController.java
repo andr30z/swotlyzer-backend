@@ -1,19 +1,17 @@
 package com.api.swotlyzer.controllers;
 
 import com.api.swotlyzer.dtos.CreateUserDTO;
-import com.api.swotlyzer.models.UsersModel;
+import com.api.swotlyzer.models.User;
 import com.api.swotlyzer.services.UsersService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/users")
 public class UsersController {
 
-    final UsersService usersService;
+    private final UsersService usersService;
 
     public UsersController(UsersService usersService) {
         this.usersService = usersService;
@@ -26,7 +24,7 @@ public class UsersController {
     }
 
     @PostMapping
-    public UsersModel create(@RequestBody @Validated CreateUserDTO createUserDTO) {
+    public User create(@RequestBody @Validated CreateUserDTO createUserDTO) {
         return usersService.create(createUserDTO);
     }
 }

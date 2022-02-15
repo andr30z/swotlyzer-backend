@@ -1,5 +1,7 @@
 package com.api.swotlyzer.exceptions;
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,13 +13,12 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-//import javax.persistence.EntityExistsException;
-//import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -27,7 +28,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 Collections.singletonList(exception.getMessage()));
     }
 
-    @ExceptionHandler(HttpClientErrorException.Conflict.class)
+    @ExceptionHandler(ConflictException.class)
     public ResponseEntity<Object> handleEntityExistsException(HttpClientErrorException.Conflict exception) {
         return buildResponseEntity(HttpStatus.CONFLICT, exception.getMessage(),
                 Collections.singletonList(exception.getMessage()));
