@@ -15,7 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Document(collation = "users")
-public class User {
+public class UsersModel {
     @Id
     private String _id;
     private String name;
