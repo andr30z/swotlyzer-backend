@@ -1,5 +1,6 @@
 package com.api.swotlyzer.services.impl;
 
+import com.api.swotlyzer.dtos.CustomUserDetails;
 import com.api.swotlyzer.models.User;
 import com.api.swotlyzer.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;

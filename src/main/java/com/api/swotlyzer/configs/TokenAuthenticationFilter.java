@@ -1,8 +1,8 @@
 package com.api.swotlyzer.configs;
 
-import com.anilaltunkan.security.service.CustomUserDetailsServiceImpl;
-import com.anilaltunkan.security.service.TokenProvider;
-import com.anilaltunkan.security.util.SecurityCipher;
+import com.api.swotlyzer.services.TokenProvider;
+import com.api.swotlyzer.services.impl.CustomUserDetailsServiceImpl;
+import com.api.swotlyzer.utils.SecurityCipher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,10 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * @Author: TCMALTUNKAN - MEHMET ANIL ALTUNKAN
- * @Date: 30.12.2019:11:36, Pzt
- **/
+
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Value("${authentication-test.auth.accessTokenCookieName}")
     private String accessTokenCookieName;

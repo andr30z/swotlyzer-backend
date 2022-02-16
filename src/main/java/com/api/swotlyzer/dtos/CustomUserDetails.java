@@ -1,13 +1,12 @@
 package com.api.swotlyzer.dtos;
 
 import com.api.swotlyzer.models.User;
+import com.api.swotlyzer.models.UserRoles;
 import lombok.Data;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
 @Data
 public class CustomUserDetails implements UserDetails {
@@ -18,8 +17,8 @@ public class CustomUserDetails implements UserDetails {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getAuthorities().stream().map(Authority::grantedAuthority).collect(Collectors.toList());
+    public Collection getAuthorities() {
+        return Collections.singletonList(UserRoles.DEFAULT);
     }
 
     @Override
@@ -49,6 +48,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.getEnabled();
+        return true;
     }
 }
