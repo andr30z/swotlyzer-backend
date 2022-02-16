@@ -26,5 +26,6 @@ public class User {
     private Date updatedAt;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+    private Set<Authority> authorities;
 
 }

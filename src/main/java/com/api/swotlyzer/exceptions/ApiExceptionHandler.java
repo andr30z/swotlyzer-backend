@@ -22,14 +22,14 @@ import java.util.List;
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(HttpClientErrorException.NotFound.class)
-    public ResponseEntity<Object> handleEntityNotFoundException(HttpClientErrorException.NotFound exception) {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Object> handleEntityNotFoundException(ResourceNotFoundException exception) {
         return buildResponseEntity(HttpStatus.NOT_FOUND, exception.getMessage(),
                 Collections.singletonList(exception.getMessage()));
     }
 
-    @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<Object> handleEntityExistsException(HttpClientErrorException.Conflict exception) {
+    @ExceptionHandler(EntityExistsException.class)
+    public ResponseEntity<Object> handleEntityExistsException(EntityExistsException exception) {
         return buildResponseEntity(HttpStatus.CONFLICT, exception.getMessage(),
                 Collections.singletonList(exception.getMessage()));
     }

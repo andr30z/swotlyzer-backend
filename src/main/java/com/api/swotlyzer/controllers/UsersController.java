@@ -27,4 +27,9 @@ public class UsersController {
     public User create(@RequestBody @Validated CreateUserDTO createUserDTO) {
         return usersService.create(createUserDTO);
     }
+
+    @GetMapping("/{id}")
+    public User findById(@PathVariable String id) {
+        return usersService.findById(id);
+    }
 }
