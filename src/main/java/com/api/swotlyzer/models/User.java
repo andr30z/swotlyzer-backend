@@ -21,6 +21,7 @@ public class User {
     private String _id;
     private String email;
     private String name;
+    private String phone;
     @CreatedDate
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Date createdAt;

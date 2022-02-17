@@ -1,10 +1,11 @@
 package com.api.swotlyzer.dtos;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 @Getter
@@ -18,6 +19,10 @@ public class CreateUserDTO {
     @NotBlank
     @Size(min = 8, message = "should have at least 8 characters.")
     private String password;
+
+    @NotBlank
+    @Size(min = 7)
+    private String phone;
 
 
 }
