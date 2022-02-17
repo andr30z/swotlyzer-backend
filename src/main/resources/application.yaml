@@ -1,5 +1,5 @@
 
-authentication-test:
+authentication:
   auth:
     tokenSecret: myTokenSecret
     tokenExpirationMsec: 3600000 #1 hour

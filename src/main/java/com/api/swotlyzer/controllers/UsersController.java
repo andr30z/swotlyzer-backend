@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping("/users")
+@RequestMapping("/v1/users")
 public class UsersController {
 
     private final UsersService usersService;
@@ -25,7 +25,12 @@ public class UsersController {
 
     @PostMapping
     public User create(@RequestBody @Validated CreateUserDTO createUserDTO) {
-        return usersService.create(createUserDTO);
+        return this.usersService.create(createUserDTO);
+    }
+
+    @GetMapping("/me")
+    public User me() {
+        return this.usersService.me();
     }
 
     @GetMapping("/{id}")

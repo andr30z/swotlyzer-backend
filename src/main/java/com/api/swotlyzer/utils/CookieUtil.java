@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CookieUtil {
-    @Value("${authentication-test.auth.accessTokenCookieName}")
+    @Value("${authentication.auth.accessTokenCookieName}")
     private String accessTokenCookieName;
 
-    @Value("${authentication-test.auth.refreshTokenCookieName}")
+    @Value("${authentication.auth.refreshTokenCookieName}")
     private String refreshTokenCookieName;
 
     public HttpCookie createAccessTokenCookie(String token, Long duration) {

@@ -21,10 +21,10 @@ import java.io.IOException;
 
 
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
-    @Value("${authentication-test.auth.accessTokenCookieName}")
+    @Value("${authentication.auth.accessTokenCookieName}")
     private String accessTokenCookieName;
 
-    @Value("${authentication-test.auth.refreshTokenCookieName}")
+    @Value("${authentication.auth.refreshTokenCookieName}")
     private String refreshTokenCookieName;
 
     @Autowired
@@ -66,6 +66,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private String getJwtFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
+        if (cookies == null) return null;
         for (Cookie cookie : cookies) {
             if (accessTokenCookieName.equals(cookie.getName())) {
                 String accessToken = cookie.getValue();

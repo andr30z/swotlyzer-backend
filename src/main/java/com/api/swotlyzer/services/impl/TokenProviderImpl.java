@@ -17,13 +17,13 @@ import java.util.Date;
 @Service
 public class TokenProviderImpl implements TokenProvider {
 
-    @Value("${authentication-test.auth.tokenSecret}")
+    @Value("${authentication.auth.tokenSecret}")
     private String tokenSecret;
 
-    @Value("${authentication-test.auth.tokenExpirationMsec}")
+    @Value("${authentication.auth.tokenExpirationMsec}")
     private Long tokenExpirationMsec;
 
-    @Value("${authentication-test.auth.refreshTokenExpirationMsec}")
+    @Value("${authentication.auth.refreshTokenExpirationMsec}")
     private Long refreshTokenExpirationMsec;
 
     @Override

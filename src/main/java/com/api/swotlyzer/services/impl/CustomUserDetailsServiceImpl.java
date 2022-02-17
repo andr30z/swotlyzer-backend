@@ -1,6 +1,7 @@
 package com.api.swotlyzer.services.impl;
 
 import com.api.swotlyzer.dtos.CustomUserDetails;
+import com.api.swotlyzer.exceptions.ResourceNotFoundException;
 import com.api.swotlyzer.models.User;
 import com.api.swotlyzer.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         User user =
-                userRepository.findUserByEmail(s).orElseThrow(() -> new UsernameNotFoundException("User not found with email " + s));
+                userRepository.findUserByEmail(s).orElseThrow(() -> new ResourceNotFoundException("User not found with email " + s));
         return new CustomUserDetails(user);
     }
 }

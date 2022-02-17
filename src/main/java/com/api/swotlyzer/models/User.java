@@ -1,5 +1,6 @@
 package com.api.swotlyzer.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,11 +19,13 @@ import java.util.Date;
 public class User {
     @Id
     private String _id;
-    private String name;
     private String email;
+    private String name;
     @CreatedDate
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Date createdAt;
     @LastModifiedDate
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Date updatedAt;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
