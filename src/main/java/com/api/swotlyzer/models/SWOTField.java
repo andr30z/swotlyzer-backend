@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @Data
 @Document
-public class SWOTField {
+public class SWOTField extends BaseEntity{
 
     @Id
     private String _id;
