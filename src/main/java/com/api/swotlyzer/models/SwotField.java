@@ -7,23 +7,19 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
-
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 @Document
-public class SWOTAnalysis extends BaseEntity {
+public class SwotField extends BaseEntity{
+
     @Id
     private String _id;
-
-    private String title;
-    private SWOTLayoutTypes swotLayoutTypes;
-
-    @DBRef
-    private List<SWOTField> swotFields;
+    private String text;
+    private String fontFamily;
+    private String fontWeight;
+    private String color;
 
     @DBRef
     private User creator;
-
 }

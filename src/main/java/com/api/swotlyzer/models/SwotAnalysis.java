@@ -7,19 +7,27 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 @Document
-public class SWOTField extends BaseEntity{
-
+public class SwotAnalysis extends BaseEntity {
     @Id
     private String _id;
-    private String text;
-    private String fontFamily;
-    private String fontWeight;
-    private String color;
+
+    private String title;
+    private SwotLayoutTypes swotLayoutType;
+    private boolean swotTemplate;
+
+//    @DBRef
+//    private List<SwotField> swotFields;
 
     @DBRef
     private User creator;
+
+
+    public void setSwotLayoutType(String literalString) {
+        this.swotLayoutType = SwotLayoutTypes.valueOf(literalString);
+    }
+
 }

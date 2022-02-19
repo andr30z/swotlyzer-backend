@@ -1,6 +1,6 @@
 package com.api.swotlyzer.models;
 
-public enum SWOTLayoutTypes {
+public enum SwotLayoutTypes {
     DEFAULT,
 
 }
