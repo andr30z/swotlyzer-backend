@@ -7,6 +7,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,8 +21,14 @@ public class SwotAnalysis extends BaseEntity {
     private SwotLayoutTypes swotLayoutType;
     private boolean swotTemplate;
 
-//    @DBRef
-//    private List<SwotField> swotFields;
+    @DBRef
+    private List<SwotField> swotFieldStrengths;
+    @DBRef
+    private List<SwotField> swotFieldWeaknesses;
+    @DBRef
+    private List<SwotField> swotFieldOpportunities;
+    @DBRef
+    private List<SwotField> swotFieldThreats;
 
     @DBRef
     private User creator;

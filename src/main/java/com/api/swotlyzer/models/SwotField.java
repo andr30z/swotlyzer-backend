@@ -15,7 +15,9 @@ public class SwotField extends BaseEntity{
 
     @Id
     private String _id;
+
     private String text;
+    private int fontSize;
     private String fontFamily;
     private String fontWeight;
     private String color;
