@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.stream.Stream;
 
 @Service
@@ -46,6 +47,10 @@ public class SwotAnalysisServiceImpl implements SwotAnalysisService {
     @Override
     public SwotAnalysis create(CreateSwotAnalysisDTO createSWOTAnalysisDTO) {
         SwotAnalysis swotAnalysis = new SwotAnalysis();
+        swotAnalysis.setSwotFieldWeaknesses(Collections.emptyList());
+        swotAnalysis.setSwotFieldStrengths(Collections.emptyList());
+        swotAnalysis.setSwotFieldThreats(Collections.emptyList());
+        swotAnalysis.setSwotFieldOpportunities(Collections.emptyList());
         BeanUtils.copyProperties(createSWOTAnalysisDTO, swotAnalysis);
         User currentUser = this.usersService.me();
         swotAnalysis.setCreator(currentUser);
