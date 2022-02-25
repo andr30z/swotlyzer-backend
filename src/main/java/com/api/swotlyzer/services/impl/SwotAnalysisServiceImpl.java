@@ -33,7 +33,7 @@ public class SwotAnalysisServiceImpl implements SwotAnalysisService {
     @Override
     public SwotAnalysis findById(String id) {
         return this.swotAnalysisRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Resource not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("SWOT Analysis not found."));
     }
 
     @Override
