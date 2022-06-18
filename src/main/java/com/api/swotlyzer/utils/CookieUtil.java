@@ -20,7 +20,7 @@ public class CookieUtil {
                 .maxAge(duration)
                 .httpOnly(true)
                 .sameSite("None")
-                .secure(true)
+//                .secure(true)
                 .path("/")
                 .build();
     }
@@ -30,7 +30,7 @@ public class CookieUtil {
     }
 
     public HttpCookie createRefreshTokenCookie(String token, Long duration) {
-        return buildCookieConfig(accessTokenCookieName, token, duration);
+        return buildCookieConfig(refreshTokenCookieName, token, duration);
     }
 
     public HttpCookie deleteAccessTokenCookie() {

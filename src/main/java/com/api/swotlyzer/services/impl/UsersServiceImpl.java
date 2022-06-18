@@ -87,7 +87,8 @@ public class UsersServiceImpl implements UsersService {
             throw new IllegalArgumentException("Refresh Token is invalid!");
         }
 
-        String currentUserEmail = tokenProvider.getUsernameFromToken(accessToken);
+        String currentUserEmail = tokenProvider.getUsernameFromToken(refreshToken);
+        System.out.println(currentUserEmail);
 
         Token newAccessToken = tokenProvider.generateAccessToken(currentUserEmail);
         HttpHeaders responseHeaders = new HttpHeaders();

@@ -28,6 +28,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 Collections.singletonList(exception.getMessage()));
     }
 
+    @ExceptionHandler(OperationNotAllowedException.class)
+    public ResponseEntity<Object> handleEntityOperationNotAllowedException(OperationNotAllowedException exception) {
+        return buildResponseEntity(HttpStatus.FORBIDDEN, exception.getMessage(),
+                Collections.singletonList(exception.getMessage()));
+    }
+
     @ExceptionHandler(EntityExistsException.class)
     public ResponseEntity<Object> handleEntityExistsException(EntityExistsException exception) {
         return buildResponseEntity(HttpStatus.CONFLICT, exception.getMessage(),
