@@ -32,7 +32,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.api.swotlyzer"))
+                .apis(RequestHandlerSelectors.basePackage("com.swotlyzer.api.core"))
                 .paths(PathSelectors.any())
                 .build();
     }

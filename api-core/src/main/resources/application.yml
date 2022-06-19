@@ -1,0 +1,23 @@
+.env:
+  prefix: ""
+
+authentication:
+  auth:
+    tokenSecret: myTokenSecret
+    tokenExpirationMsec: 3600000 #1 hour
+    refreshTokenExpirationMsec: 7776000000 #90 days
+    accessTokenCookieName: accessToken
+    refreshTokenCookieName: refreshToken
+
+spring:
+  data:
+    mongodb:
+      uri: ${API_CORE_MONGO_CONNECTION}
+  web:
+    locale: en
+
+  jackson:
+    date-format: yyyy-MM-dd
+    serialization:
+      write_dates_as_timestamps: false
+

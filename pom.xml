@@ -26,12 +26,23 @@
         <jsonwebtoken.version>0.9.1</jsonwebtoken.version>
         <jaxb-api.version>2.3.0</jaxb-api.version>
         <lombok.version>1.18.24</lombok.version>
+        <spring-dotenv.version>2.5.4</spring-dotenv.version>
     </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>me.paulschwarz</groupId>
+                <artifactId>spring-dotenv</artifactId>
+                <version>${spring-dotenv.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.api</groupId>
                 <artifactId>api-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.api</groupId>
+                <artifactId>mail-sender</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -104,6 +115,12 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-jpa</artifactId>
                 <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-configuration-processor</artifactId>
+                <version>${spring-boot.version}</version>
+                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>

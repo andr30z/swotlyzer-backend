@@ -5,6 +5,7 @@ import com.swotlyzer.api.core.dtos.LoginRequest;
 import com.swotlyzer.api.core.utils.SecurityCipher;
 import com.swotlyzer.api.core.dtos.LoginResponse;
 import com.swotlyzer.api.core.services.UsersService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/v1/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
