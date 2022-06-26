@@ -10,7 +10,6 @@ import com.microservices.swotlyzer.api.core.services.UsersService;
 import com.microservices.swotlyzer.api.core.utils.CookieUtil;
 import com.microservices.swotlyzer.common.config.dtos.EmailDTO;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +17,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
-import javax.validation.constraints.Email;
 import java.security.SecureRandom;
 import java.util.Optional;
 
@@ -35,14 +31,14 @@ public class UsersServiceImpl implements UsersService {
 
     private final CookieUtil cookieUtil;
 
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
 
     public UsersServiceImpl(UsersRepository usersRepository, TokenProvider tokenProvider, CookieUtil cookieUtil,
-                            WebClient webClient) {
+                            WebClient.Builder webClientBuilder) {
         this.usersRepository = usersRepository;
         this.tokenProvider = tokenProvider;
         this.cookieUtil = cookieUtil;
-        this.webClient = webClient;
+        this.webClientBuilder = webClientBuilder;
     }
 
 
@@ -55,7 +51,7 @@ public class UsersServiceImpl implements UsersService {
                         .content(CONTENT).emailFrom(EMAIL_FROM)
                         .emailTo(user.getEmail()).build();
         try {
-            this.webClient.post().uri("http://localhost:9090/api/v1/email/send")
+            this.webClientBuilder.build().post().uri("http://mail-sender-service/api/v1/email/send")
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .body(BodyInserters.fromValue(emailDTO)).retrieve().bodyToMono(Object.class).block();
         } catch (Exception e) {

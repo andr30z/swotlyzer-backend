@@ -1,9 +1,6 @@
 .env:
   prefix: ""
 
-server:
-  port: 0
-
 eureka:
   client:
     service-url:
