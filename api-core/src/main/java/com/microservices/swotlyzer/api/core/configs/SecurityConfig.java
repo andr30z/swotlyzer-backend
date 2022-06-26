@@ -87,7 +87,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.html",
                         "/**/*.css",
                         "/**/*.js").permitAll()
-                .antMatchers("/api/v1/auth/**").permitAll().antMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
+                .antMatchers("/swot/api/v1/auth/**").permitAll().antMatchers(HttpMethod.POST, "/swot/api/v1/users").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
