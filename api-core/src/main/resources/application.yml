@@ -1,6 +1,14 @@
 .env:
   prefix: ""
 
+server:
+  port: 0
+
+eureka:
+  client:
+    service-url:
+      defautlZone: http://localhost:8761/eureka
+
 authentication:
   auth:
     tokenSecret: myTokenSecret
@@ -10,6 +18,8 @@ authentication:
     refreshTokenCookieName: refreshToken
 
 spring:
+  application:
+    name: api-core-service
   data:
     mongodb:
       uri: ${API_CORE_MONGO_CONNECTION}

@@ -7,6 +7,7 @@
         <module>api-core</module>
         <module>mail-sender</module>
         <module>common-config</module>
+        <module>discovery-server</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -28,6 +29,8 @@
         <jaxb-api.version>2.3.0</jaxb-api.version>
         <lombok.version>1.18.24</lombok.version>
         <spring-dotenv.version>2.5.4</spring-dotenv.version>
+        <spring-cloud.version>2021.0.2</spring-cloud.version>
+        <eureka.version>3.1.3</eureka.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -50,6 +53,26 @@
                 <groupId>com.api</groupId>
                 <artifactId>common-config</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.api</groupId>
+                <artifactId>discovery-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+                <version>${eureka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+                <version>${eureka.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
