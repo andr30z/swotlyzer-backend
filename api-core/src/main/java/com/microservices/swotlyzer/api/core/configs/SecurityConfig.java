@@ -86,6 +86,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.jpg",
                         "/**/*.html",
                         "/**/*.css",
+                        "/swot/api-docs/swagger-ui.html",
                         "/**/*.js").permitAll()
                 .antMatchers("/swot/api/v1/auth/**").permitAll().antMatchers(HttpMethod.POST, "/swot/api/v1/users").permitAll()
                 .anyRequest().authenticated();

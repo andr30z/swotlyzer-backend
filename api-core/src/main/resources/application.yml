@@ -35,3 +35,7 @@ server:
   port: 0
   servlet:
 #    context-path: /swot
+
+springdoc:
+  swagger-ui:
+    path: /swot/api-docs/swagger-ui.html
