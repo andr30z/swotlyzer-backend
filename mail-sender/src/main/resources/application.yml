@@ -5,11 +5,9 @@ server:
   port: 0
 
 eureka:
-  instance:
-    prefer-ip-address: true
   client:
     service-url:
-      defautlZone: http://localhost:8761/eureka
+      defautlZone: http://eureka:password@localhost:8761/eureka
 
 spring:
   application:

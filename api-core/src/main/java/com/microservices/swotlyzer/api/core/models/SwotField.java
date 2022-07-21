@@ -2,11 +2,12 @@ package com.microservices.swotlyzer.api.core.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -22,6 +23,5 @@ public class SwotField extends BaseEntity{
     private String fontWeight;
     private String color;
 
-    @DBRef
-    private User creator;
+    private Long ownerId;
 }

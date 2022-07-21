@@ -2,13 +2,16 @@ package com.microservices.swotlyzer.api.core.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,16 +25,16 @@ public class SwotAnalysis extends BaseEntity {
     private boolean swotTemplate;
 
     @DBRef
-    private List<SwotField> swotFieldStrengths;
+    private List<SwotField> strengths;
     @DBRef
-    private List<SwotField> swotFieldWeaknesses;
+    private List<SwotField> weaknesses;
     @DBRef
-    private List<SwotField> swotFieldOpportunities;
+    private List<SwotField> opportunities;
     @DBRef
-    private List<SwotField> swotFieldThreats;
+    private List<SwotField> threats;
 
-    @DBRef
-    private User creator;
+    @NotNull
+    private Long ownerId;
 
 
     public void setSwotLayoutType(String literalString) {

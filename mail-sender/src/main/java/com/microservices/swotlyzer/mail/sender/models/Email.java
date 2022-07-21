@@ -1,12 +1,16 @@
 package com.microservices.swotlyzer.mail.sender.models;
 
 import com.microservices.swotlyzer.mail.sender.enums.MailStatus;
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@Getter
+@Setter
 @Entity
 @Table(name = "emails")
 public class Email {

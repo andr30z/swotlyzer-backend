@@ -12,7 +12,8 @@ api-core/src/main/resources/.env
 .settings
 .springBeans
 .sts4-cache
-
+.env
+**/.env
 ### IntelliJ IDEA ###
 .idea
 *.iws

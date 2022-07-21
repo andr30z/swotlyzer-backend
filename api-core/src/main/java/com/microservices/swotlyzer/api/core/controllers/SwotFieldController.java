@@ -1,10 +1,10 @@
 package com.microservices.swotlyzer.api.core.controllers;
 
 import com.microservices.swotlyzer.api.core.dtos.CreateSwotFieldDTO;
-import com.microservices.swotlyzer.api.core.models.SwotField;
-import com.microservices.swotlyzer.api.core.services.SwotFieldService;
 import com.microservices.swotlyzer.api.core.dtos.SwotFieldDeleteResponse;
 import com.microservices.swotlyzer.api.core.dtos.UpdateSwotFieldDTO;
+import com.microservices.swotlyzer.api.core.models.SwotField;
+import com.microservices.swotlyzer.api.core.services.SwotFieldService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

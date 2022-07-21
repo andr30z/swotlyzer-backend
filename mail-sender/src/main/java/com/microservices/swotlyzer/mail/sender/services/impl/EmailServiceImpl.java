@@ -18,7 +18,6 @@ public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
     private final EmailRepository emailRepository;
 
-
     public EmailServiceImpl(EmailRepository emailRepository, JavaMailSender javaMailSender) {
         this.emailRepository = emailRepository;
         this.javaMailSender = javaMailSender;
@@ -27,6 +26,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public Email sendMail(EmailDTO emailDTO) {
         var email = new Email();
+
         BeanUtils.copyProperties(emailDTO, email);
         email.setSendDateMail(LocalDateTime.now());
         try {

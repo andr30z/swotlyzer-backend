@@ -1,8 +1,7 @@
 package com.microservices.swotlyzer.api.core.controllers;
 
 
-import com.microservices.swotlyzer.api.core.dtos.CreateSwotAnalysisDTO;
-import com.microservices.swotlyzer.api.core.dtos.PaginationResponse;
+import com.microservices.swotlyzer.api.core.dtos.*;
 import com.microservices.swotlyzer.api.core.dtos.UpdateSwotAnalysisDTO;
 import com.microservices.swotlyzer.api.core.models.SwotAnalysis;
 import com.microservices.swotlyzer.api.core.services.SwotAnalysisService;
@@ -22,7 +21,7 @@ public class SwotAnalysisController {
         return this.swotAnalysisService.findById(id);
     }
 
-    @GetMapping("/my")
+    @GetMapping("/me")
     public PaginationResponse<SwotAnalysis> getMySwotAnalysis(@RequestParam(name = "page", defaultValue = "1") int page,
                                                               @RequestParam(name = "perPage", defaultValue = "15")
                                                                       int perPage) {

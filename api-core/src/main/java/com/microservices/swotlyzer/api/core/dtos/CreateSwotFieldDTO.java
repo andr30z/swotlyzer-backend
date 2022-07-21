@@ -1,9 +1,9 @@
 package com.microservices.swotlyzer.api.core.dtos;
 
+import com.microservices.swotlyzer.api.core.enums.SwotFieldType;
 import com.microservices.swotlyzer.api.core.validations.ValueOfEnum;
 import lombok.Getter;
 import lombok.Setter;
-
 
 import javax.validation.constraints.NotNull;
 
@@ -22,13 +22,6 @@ public class CreateSwotFieldDTO {
     private String fontWeight;
     @NotNull(message = "is required")
     private String color;
-
-    public enum SwotFieldType{
-        WEAKNESS,
-        STRENGTH,
-        OPPORTUNITY,
-        THREAT
-    }
 
     @ValueOfEnum(enumClass = SwotFieldType.class)
     @NotNull(message = "is required")
