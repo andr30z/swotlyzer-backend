@@ -1,0 +1,56 @@
+version: '3.7'
+services:
+
+  postgresql-db:
+    image: postgres:latest
+    container_name: postgres-container
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+
+  api-gateway:
+    build: './api-gateway'
+    container_name: api-gateway-container
+    restart: always
+    ports:
+      - '8080:8080'
+
+  discovery-server:
+    build: './discovery-server'
+    container_name: discovery-server-container
+    restart: always
+    env_file:
+      - ./discovery-server/src/main/resources/.env
+    ports:
+      - '8761:8761'
+
+  mail-sender:
+    build: './mail-sender'
+    container_name: mail-sender-container
+    restart: always
+    env_file:
+      - ./mail-sender/src/main/resources/.env
+    ports:
+      - '8082'
+
+  api-core:
+    build: './api-core'
+    container_name: api-core-container
+    restart: always
+    env_file:
+      - ./api-core/src/main/resources/.env
+    ports:
+      - '8083'
+
+  auth-user-service:
+    build: './auth-user-service'
+    container_name: auth-user-service-container
+    restart: always
+    env_file:
+      - ./auth-user-service/src/main/resources/.env
+    ports:
+      - '8083'
+
+

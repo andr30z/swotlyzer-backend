@@ -1,0 +1,42 @@
+.env:
+  prefix: ""
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://eureka:password@localhost:8761/eureka
+
+authentication:
+  auth:
+    tokenSecret: myTokenSecret
+    tokenExpirationMsec: 3600000 #1 hour
+    refreshTokenExpirationMsec: 7776000000 #90 days
+    accessTokenCookieName: accessToken
+    refreshTokenCookieName: refreshToken
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  application:
+
+    name: api-core-service
+
+  data:
+    mongodb:
+      uri: ${API_CORE_MONGO_CONNECTION}
+  web:
+    locale: en
+
+  jackson:
+    date-format: yyyy-MM-dd
+    serialization:
+      write_dates_as_timestamps: false
+server:
+  port: 0
+
+springdoc:
+  swagger-ui:
+    path: /swot/api-docs/swagger-ui.html
