@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SwotAnalysisRepository extends MongoRepository<SwotAnalysis, String> {
-    Page<SwotAnalysis> findByCreator(Long ownerId, Pageable pageable);
+    Page<SwotAnalysis> findByOwnerId(Long ownerId, Pageable pageable);
 }

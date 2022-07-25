@@ -41,7 +41,7 @@ public class SwotAnalysisServiceImpl implements SwotAnalysisService {
         Pageable paging = PageRequest.of(page - 1, perPage);
 
         var userHeaderInfo = WebClientUtils.getUserHeadersInfo(httpServletRequest);
-        Page<SwotAnalysis> swotPage = this.swotAnalysisRepository.findByCreator(userHeaderInfo.getUserId(), paging);
+        Page<SwotAnalysis> swotPage = this.swotAnalysisRepository.findByOwnerId(userHeaderInfo.getUserId(), paging);
         return new PaginationUtil<SwotAnalysis, SwotAnalysisRepository>().buildResponse(swotPage);
     }
 

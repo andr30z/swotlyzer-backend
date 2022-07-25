@@ -12,6 +12,12 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = "com.microservices.swotlyzer")
 public class ApiGatewayApplication {
     public static void main(String[] args) {
-        SpringApplication.run(ApiGatewayApplication.class, args);
+
+        try {
+            SpringApplication app = new SpringApplication(ApiGatewayApplication.class);
+            app.run(args);
+        } catch(Throwable ex) {
+            ex.printStackTrace();
+        }
     }
 }
