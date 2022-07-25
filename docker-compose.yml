@@ -1,0 +1,10 @@
+version: '1'
+services:
+  mail-sender:
+    build: './mail-sender'
+    container_name: mail-sender-container
+    restart: always
+    env_file:
+      - ./mail-sender/src/main/resources/.env
+    ports:
+      - '8083'
