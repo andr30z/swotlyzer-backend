@@ -2,6 +2,7 @@ package com.microservices.swotlyzer.common.config.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,6 +14,7 @@ import javax.persistence.MappedSuperclass;
 @ToString
 @Getter
 @Setter
+@SuperBuilder
 @MappedSuperclass
 public class BaseUser {
     @Id

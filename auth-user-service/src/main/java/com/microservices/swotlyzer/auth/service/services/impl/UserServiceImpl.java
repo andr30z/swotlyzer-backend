@@ -11,6 +11,7 @@ import com.microservices.swotlyzer.auth.service.services.UserService;
 import com.microservices.swotlyzer.auth.service.utils.CookieUtil;
 import com.microservices.swotlyzer.common.config.dtos.EmailDTO;
 import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
+import org.springframework.context.annotation.ComponentScan;
 import web.error.handling.EntityExistsException;
 import web.error.handling.ResourceNotFoundException;
 import org.springframework.beans.BeanUtils;
@@ -27,6 +28,7 @@ import java.security.SecureRandom;
 import java.util.Optional;
 
 @Service
+@ComponentScan(basePackages = {"com.microservices.swotlyzer"})
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
@@ -74,7 +76,7 @@ public class UserServiceImpl implements UserService {
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         User createdUser = this.userRepository.save(user);
-        this.sendCreatedUserMail(createdUser);
+        sendCreatedUserMail(createdUser);
         return createdUser;
     }
 

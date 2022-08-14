@@ -22,6 +22,17 @@ spring:
     url: ${AUTH_SERVICE_POSTGRESQL_CONNECTION}
     username: ${AUTH_SERVICE_POSTGRESQL_USERNAME}
     password: ${AUTH_SERVICE_POSTGRESQL_PASSWORD}
+    driver-class-name: org.h2.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
+
+
+
+#  spring.mail.host=smtp.gmail.com
+#  spring.mail.port=587
+#  spring.mail.username=${MAIL_SENDER_MAIL_USERNAME}
+#  spring.mail.password=${MAIL_SENDER_MAIL_PASSWORD}
+#  spring.mail.properties.mail.smtp.auth=true
+
+#  spring.mail.properties.mail.smtp.starttls.enable=true
