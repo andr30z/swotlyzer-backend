@@ -36,6 +36,8 @@
         <eureka.version>3.1.3</eureka.version>
         <spring-cloud-gateway.version>3.1.3</spring-cloud-gateway.version>
         <h2.version>1.4.200</h2.version>
+        <mock-server.version>4.0.1</mock-server.version>
+        <ok-http.version>4.0.1</ok-http.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -205,6 +207,18 @@
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
                 <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${ok-http.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>mockwebserver</artifactId>
+                <version>${mock-server.version}</version>
+                <scope>test</scope>
             </dependency>
             <!--            <dependency>-->
             <!--                <groupId>org.springframework.security</groupId>-->
