@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<LoginResponse> refresh(String accessToken, String refreshToken) {
         var refreshTokenValid = tokenProvider.validateToken(refreshToken);
-        if (!refreshTokenValid) throw new IllegalArgumentException("Refresh Token is invalid!");
+        if (!refreshTokenValid) throw new BadRequestException("Refresh Token is invalid!");
 
 
         String currentUserEmail = tokenProvider.getUsernameFromToken(refreshToken);
@@ -136,7 +136,7 @@ public class UserServiceImpl implements UserService {
                         .toString());
 
         LoginResponse loginResponse = new LoginResponse(LoginResponse.SuccessFailure.SUCCESS,
-                "Auth successful. Tokens are created in cookie.");
+                "Auth successful. Tokens are created in cookies.");
         return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
     }
 

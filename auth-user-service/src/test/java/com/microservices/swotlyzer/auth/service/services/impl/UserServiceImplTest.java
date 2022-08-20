@@ -35,6 +35,11 @@ class UserServiceImplTest {
     @Captor
     private ArgumentCaptor<User> userArgumentCaptor;
 
+    @Captor
+    private ArgumentCaptor<Long> tokenDurationArgumentCaptor;
+    @Captor
+    private ArgumentCaptor<String> accessTokenValueArgumentCaptor;
+
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -168,8 +173,33 @@ class UserServiceImplTest {
     }
 
     @Test
-    @Disabled
-    void refresh() {
+    @DisplayName("It should refresh user token.")
+    void itShouldRefreshToken() {
+
+        String generatedToken = "NEW_TOKEN_TEST";
+        String emailFromToken = "testmail@yay.com";
+        when(tokenProvider.validateToken(anyString())).thenReturn(true);
+        var tokenMock = new Token(Token.TokenType.ACCESS, generatedToken, DateUtils.MILLIS_PER_DAY, null);
+        when(tokenProvider.getUsernameFromToken(anyString())).thenReturn(emailFromToken);
+        when(tokenProvider.generateAccessToken(anyString())).thenReturn(tokenMock);
+        when(cookieUtil.createAccessTokenCookie(anyString(), anyLong())).thenReturn(
+                ResponseCookie.from("accessToken", generatedToken).build());
+
+        //when
+        var response = underTest.refresh(WANNABE_ACCESS_TOKEN, WANNABE_ACCESS_TOKEN);
+        verify(cookieUtil, Mockito.times(1)).createAccessTokenCookie(accessTokenValueArgumentCaptor
+                        .capture(),
+                tokenDurationArgumentCaptor.capture());
+
+        //assert that generated token is new
+        assertThat(accessTokenValueArgumentCaptor.getValue()).isEqualTo(generatedToken);
+
+
+        assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).isNotNull();
+        var responseBody = response.getBody();
+        assertThat(responseBody).isNotNull();
+        assertThat(responseBody.getStatus()).isEqualTo(LoginResponse.SuccessFailure.SUCCESS);
+
     }
 
     @Test
