@@ -146,13 +146,13 @@ public class UserServiceImpl implements UserService {
         if (!isTokenValid) throw new ResourceNotFoundException("");
         var tokenUsername = this.tokenProvider.getUsernameFromToken(token);
         return this.userRepository.findUserByEmail(tokenUsername)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontado para o token informado!"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
     }
 
     @Override
     public User findById(Long id) {
         return this.userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found" + "."));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
     }
 
     @Override

@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.reactive.function.client.WebClient;
 import web.error.handling.BadRequestException;
 import web.error.handling.EntityExistsException;
+import web.error.handling.ResourceNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
@@ -177,8 +178,26 @@ class UserServiceImplTest {
     }
 
     @Test
-    @Disabled
-    void findById() {
+    @DisplayName("It should return an user by Id.")
+    void itShouldFindUserById() {
+        String userMail = "testemail@gmail.com";
+        String phone = "61993459845";
+        String password = "123456";
+        String testName = "Test";
+        Long userId = 1L;
+        User user = User.builder().id(userId).name(testName).phone(phone).email(userMail).password(password).build();
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
+        var userById = underTest.findById(user.getId());
+
+        assertThat(userById.getId()).isEqualTo(user.getId());
+    }
+
+    @Test
+    @DisplayName("Will throw error when user Id doesn't exist.")
+    void willThrowWhenUserIdDontExist() {
+        assertThatThrownBy(() -> underTest.findById(anyLong())).isInstanceOf(ResourceNotFoundException.class)
+                .hasMessageContaining("User not found.");
     }
 
     @Test
