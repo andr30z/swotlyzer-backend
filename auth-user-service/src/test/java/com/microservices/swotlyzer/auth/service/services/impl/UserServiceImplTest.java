@@ -9,12 +9,10 @@ import com.microservices.swotlyzer.auth.service.repositories.UserRepository;
 import com.microservices.swotlyzer.auth.service.services.TokenProvider;
 import com.microservices.swotlyzer.auth.service.utils.CookieUtil;
 import org.apache.commons.lang.time.DateUtils;
-import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,10 +21,9 @@ import web.error.handling.BadRequestException;
 import web.error.handling.EntityExistsException;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.Clock;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
@@ -185,15 +182,37 @@ class UserServiceImplTest {
     }
 
     @Test
-    @Disabled
-    void me() {
-        LoginRequest loginRequest = new LoginRequest("teste@mail.com", "123456");
+    @DisplayName("It should get the current logged user.")
+    void itShouldGetCurrentLoggedUser() {
+        //given
         String userMail = "testemail@gmail.com";
         String phone = "61993459845";
-        String password = "testepassword";
+        String password = "123456";
         String testName = "Test";
         Long userId = 1L;
-        User userToLogin =
+        User currentUser =
                 User.builder().id(userId).name(testName).phone(phone).email(userMail).password(password).build();
+
+        when(httpServletRequest.getHeader(anyString())).thenReturn(userId.toString());
+
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(currentUser));
+
+        var loggedUser = underTest.me();
+
+        assertThat(loggedUser.getId()).isEqualTo(userId);
+
+    }
+
+    @Test
+    @DisplayName("Will throw error when user Id header are not present.")
+    void willThrowWhenUserIdHeaderIsEmpty() {
+        when(httpServletRequest.getHeader(anyString())).thenReturn(null);
+
+        assertThatThrownBy(() -> underTest.me()).isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("No user ID headers found!");
+
+
+        verify(userRepository, never()).findById(Mockito.anyLong());
+
     }
 }

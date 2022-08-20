@@ -11,19 +11,19 @@ import com.microservices.swotlyzer.auth.service.services.UserService;
 import com.microservices.swotlyzer.auth.service.utils.CookieUtil;
 import com.microservices.swotlyzer.common.config.dtos.EmailDTO;
 import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import web.error.handling.BadRequestException;
-import web.error.handling.EntityExistsException;
-import web.error.handling.ResourceNotFoundException;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import web.error.handling.BadRequestException;
+import web.error.handling.EntityExistsException;
+import web.error.handling.ResourceNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.SecureRandom;
@@ -157,9 +157,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User me() {
-        var userIdHeader = httpServletRequest.getHeader("X-auth-user-id");
+        var userIdHeader = httpServletRequest.getHeader(WebClientUtils.X_AUTH_USER_ID);
         if (userIdHeader == null || userIdHeader.trim().length() == 0)
-            throw new ResourceNotFoundException("No users headers could be found!");
+            throw new BadRequestException("No user ID headers found!");
         Long currentUserId = Long.parseLong(userIdHeader);
         return this.findById(currentUserId);
     }
