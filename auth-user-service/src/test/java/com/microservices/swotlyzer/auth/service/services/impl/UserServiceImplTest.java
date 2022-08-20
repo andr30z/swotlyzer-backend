@@ -1,24 +1,39 @@
 package com.microservices.swotlyzer.auth.service.services.impl;
 
 import com.microservices.swotlyzer.auth.service.dtos.CreateUserDTO;
+import com.microservices.swotlyzer.auth.service.dtos.LoginRequest;
+import com.microservices.swotlyzer.auth.service.dtos.LoginResponse;
+import com.microservices.swotlyzer.auth.service.models.Token;
 import com.microservices.swotlyzer.auth.service.models.User;
 import com.microservices.swotlyzer.auth.service.repositories.UserRepository;
 import com.microservices.swotlyzer.auth.service.services.TokenProvider;
 import com.microservices.swotlyzer.auth.service.utils.CookieUtil;
-import org.assertj.core.api.Assertions;
+import org.apache.commons.lang.time.DateUtils;
+import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpCookie;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.reactive.function.client.WebClient;
+import web.error.handling.BadRequestException;
 import web.error.handling.EntityExistsException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.Clock;
 import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 
+    public static final String WANNABE_ACCESS_TOKEN = "WANNABE_ACCESS_TOKEN";
     @Captor
     private ArgumentCaptor<User> userArgumentCaptor;
 
@@ -32,16 +47,18 @@ class UserServiceImplTest {
     private WebClient.Builder webClientBuilder;
     @Mock
     private CookieUtil cookieUtil;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     private AutoCloseable autoCloseable;
 
-    private UserServiceImpl userService;
+    private UserServiceImpl underTest;
 
     @BeforeEach
     void setUp() {
         autoCloseable = MockitoAnnotations.openMocks(this);
-        userService =
-                new UserServiceImpl(userRepository, tokenProvider, cookieUtil, webClientBuilder, httpServletRequest);
+        underTest = new UserServiceImpl(userRepository, tokenProvider, cookieUtil, webClientBuilder, httpServletRequest,
+                passwordEncoder);
     }
 
     @AfterEach
@@ -52,7 +69,7 @@ class UserServiceImplTest {
 
     @Test
     @Disabled
-    @DisplayName("It Should create an user.")
+    @DisplayName("It should create an user.")
     void itShouldCreateAnUser() {
         //give
         String userMail = "testemail@gmail.com";
@@ -63,18 +80,18 @@ class UserServiceImplTest {
         User createdUser =
                 User.builder().id(userId).name(testName).phone(phone).email(userMail).password(password).build();
 
-        Mockito.when(userRepository.save(Mockito.any())).thenReturn(createdUser);
+        when(userRepository.save(any())).thenReturn(createdUser);
 
-        userService.create(new CreateUserDTO(createdUser.getEmail(), createdUser.getName(), createdUser.getPassword(),
+        underTest.create(new CreateUserDTO(createdUser.getEmail(), createdUser.getName(), createdUser.getPassword(),
                 createdUser.getPhone()));
-        Mockito.verify(userRepository, Mockito.times(1)).save(userArgumentCaptor.capture());
-        System.out.println(userArgumentCaptor.getValue());
+        verify(userRepository, Mockito.times(1)).save(userArgumentCaptor.capture());
         //assert that the user created in this method  is the same as to the one captured by userArgumentCaptor
-        Assertions.assertThat(userArgumentCaptor.getValue().getId()).isEqualTo(userId);
-        Assertions.assertThat(userArgumentCaptor.getValue().getEmail()).isEqualTo(userMail);
+        assertThat(userArgumentCaptor.getValue().getId()).isEqualTo(userId);
+        assertThat(userArgumentCaptor.getValue().getEmail()).isEqualTo(userMail);
     }
 
     @Test
+    @DisplayName("Will throw error when Email is already in use by another User.")
     void willThrowWhenEmailIsTaken() {
         // given
         String userMail = "testemail@gmail.com";
@@ -89,18 +106,67 @@ class UserServiceImplTest {
 
         // when
         // then
-        Assertions.assertThatThrownBy(() -> userService.create(
-                        new CreateUserDTO(createdUser.getEmail(), createdUser.getName(), createdUser.getPassword(),
-                                createdUser.getPhone()))).isInstanceOf(EntityExistsException.class)
+        assertThatThrownBy(() -> underTest.create(
+                new CreateUserDTO(createdUser.getEmail(), createdUser.getName(), createdUser.getPassword(),
+                        createdUser.getPhone()))).isInstanceOf(EntityExistsException.class)
                 .hasMessageContaining("User with email: " + userMail + " already exists.");
 
-        Mockito.verify(userRepository, Mockito.never()).save(Mockito.any());
+        verify(userRepository, never()).save(Mockito.any());
 
     }
 
     @Test
-    @Disabled
-    void login() {
+    @DisplayName("It should login the user successfully.")
+    void itShouldLoginUser() {
+        //given
+        LoginRequest loginRequest = new LoginRequest("teste@mail.com", "123456");
+        String userMail = "testemail@gmail.com";
+        String phone = "61993459845";
+        String password = "testepassword";
+        String testName = "Test";
+        Long userId = 1L;
+        User userToLogin =
+                User.builder().id(userId).name(testName).phone(phone).email(userMail).password(password).build();
+
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(userToLogin));
+        var tokenMock = new Token(Token.TokenType.ACCESS, WANNABE_ACCESS_TOKEN, DateUtils.MILLIS_PER_DAY, null);
+        when(tokenProvider.generateAccessToken(anyString())).thenReturn(tokenMock);
+        when(tokenProvider.generateRefreshToken(anyString())).thenReturn(tokenMock);
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+        when(cookieUtil.createAccessTokenCookie(anyString(), anyLong())).thenReturn(
+                ResponseCookie.from("accessToken", WANNABE_ACCESS_TOKEN).build());
+
+        when(cookieUtil.createRefreshTokenCookie(anyString(), anyLong())).thenReturn(
+                ResponseCookie.from("refreshToken", WANNABE_ACCESS_TOKEN).build());
+
+        var response = underTest.login(loginRequest, null, null);
+
+
+        assertThat(response.getHeaders().get(HttpHeaders.SET_COOKIE)).isNotNull();
+        var responseBody = response.getBody();
+        assertThat(responseBody).isNotNull();
+        assertThat(responseBody.getStatus()).isEqualTo(LoginResponse.SuccessFailure.SUCCESS);
+    }
+
+    @Test
+    @DisplayName("Will throw error when login credentials are wrong.")
+    void willThrowWhenLoginCredentialsMismatch() {
+        LoginRequest loginRequest = new LoginRequest("teste@mail.com", "123456");
+        String userMail = "testemail@gmail.com";
+        String phone = "61993459845";
+        String password = "testepassword";
+        String testName = "Test";
+        Long userId = 1L;
+        User userToLogin =
+                User.builder().id(userId).name(testName).phone(phone).email(userMail).password(password).build();
+
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(userToLogin));
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
+        assertThatThrownBy(() -> underTest.login(loginRequest, null, null)).isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Password doesn't match!");
+        verify(tokenProvider, never()).generateAccessToken(Mockito.any());
+        verify(tokenProvider, never()).generateRefreshToken(Mockito.any());
+
     }
 
     @Test
@@ -121,5 +187,13 @@ class UserServiceImplTest {
     @Test
     @Disabled
     void me() {
+        LoginRequest loginRequest = new LoginRequest("teste@mail.com", "123456");
+        String userMail = "testemail@gmail.com";
+        String phone = "61993459845";
+        String password = "testepassword";
+        String testName = "Test";
+        Long userId = 1L;
+        User userToLogin =
+                User.builder().id(userId).name(testName).phone(phone).email(userMail).password(password).build();
     }
 }

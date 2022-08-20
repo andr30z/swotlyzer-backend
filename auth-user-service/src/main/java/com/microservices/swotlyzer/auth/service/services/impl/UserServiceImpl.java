@@ -12,6 +12,8 @@ import com.microservices.swotlyzer.auth.service.utils.CookieUtil;
 import com.microservices.swotlyzer.common.config.dtos.EmailDTO;
 import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import web.error.handling.BadRequestException;
 import web.error.handling.EntityExistsException;
 import web.error.handling.ResourceNotFoundException;
 import org.springframework.beans.BeanUtils;
@@ -35,15 +37,18 @@ public class UserServiceImpl implements UserService {
     private final TokenProvider tokenProvider;
     private final HttpServletRequest httpServletRequest;
     private final WebClient.Builder webClientBuilder;
+
+    private final PasswordEncoder passwordEncoder;
     private final CookieUtil cookieUtil;
 
     public UserServiceImpl(UserRepository userRepository, TokenProvider tokenProvider, CookieUtil cookieUtil,
-                           WebClient.Builder webClientBuilder, HttpServletRequest httpServletRequest) {
+                           WebClient.Builder webClientBuilder, HttpServletRequest httpServletRequest, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.tokenProvider = tokenProvider;
         this.httpServletRequest = httpServletRequest;
         this.cookieUtil = cookieUtil;
         this.webClientBuilder = webClientBuilder;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -84,6 +89,8 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<LoginResponse> login(LoginRequest loginRequest, String accessToken, String refreshToken) {
         String email = loginRequest.getEmail();
         User user = this.findByEmail(email);
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword()))
+            throw new BadRequestException("Password doesn't match!");
         var accessTokenValid = tokenProvider.validateToken(accessToken);
         var refreshTokenValid = tokenProvider.validateToken(refreshToken);
 
@@ -110,7 +117,7 @@ public class UserServiceImpl implements UserService {
         }
 
         LoginResponse loginResponse = new LoginResponse(LoginResponse.SuccessFailure.SUCCESS,
-                "Auth successful. " + "Tokens are created in cookie.");
+                "Auth successful. Tokens are created in cookies.");
         return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
 
     }
@@ -122,8 +129,6 @@ public class UserServiceImpl implements UserService {
 
 
         String currentUserEmail = tokenProvider.getUsernameFromToken(refreshToken);
-        System.out.println(currentUserEmail);
-
         Token newAccessToken = tokenProvider.generateAccessToken(currentUserEmail);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add(HttpHeaders.SET_COOKIE,
@@ -154,10 +159,9 @@ public class UserServiceImpl implements UserService {
     public User me() {
         var userIdHeader = httpServletRequest.getHeader("X-auth-user-id");
         if (userIdHeader == null || userIdHeader.trim().length() == 0)
-            throw new ResourceNotFoundException("No users headers could be " + "found");
+            throw new ResourceNotFoundException("No users headers could be found!");
         Long currentUserId = Long.parseLong(userIdHeader);
-        var user = this.findById(currentUserId);
-        return user;
+        return this.findById(currentUserId);
     }
 
     private User findByEmail(String email) {

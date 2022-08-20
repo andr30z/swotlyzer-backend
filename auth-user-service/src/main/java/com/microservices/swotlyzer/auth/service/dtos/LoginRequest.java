@@ -1,8 +1,6 @@
 package com.microservices.swotlyzer.auth.service.dtos;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
@@ -11,6 +9,7 @@ import javax.validation.constraints.NotEmpty;
 @Getter
 @Setter
 @Data
+@AllArgsConstructor
 public class LoginRequest {
     @NotEmpty(message = "Email address cannot be empty")
     @Email(message = "Please provide valid email address")

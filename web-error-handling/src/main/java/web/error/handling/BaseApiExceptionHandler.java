@@ -37,6 +37,11 @@ public class BaseApiExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(HttpStatus.CONFLICT, exception.getMessage(),
                 Collections.singletonList(exception.getMessage()));
     }
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Object> handleBadRequestException(BadRequestException exception) {
+        return buildResponseEntity(HttpStatus.BAD_REQUEST, exception.getMessage(),
+                Collections.singletonList(exception.getMessage()));
+    }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
