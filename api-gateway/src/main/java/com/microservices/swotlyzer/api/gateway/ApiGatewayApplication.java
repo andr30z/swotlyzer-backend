@@ -8,16 +8,12 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.ComponentScan;
 
 @EnableEurekaClient
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @ComponentScan(basePackages = "com.microservices.swotlyzer")
 public class ApiGatewayApplication {
     public static void main(String[] args) {
 
-        try {
-            SpringApplication app = new SpringApplication(ApiGatewayApplication.class);
-            app.run(args);
-        } catch(Throwable ex) {
-            ex.printStackTrace();
-        }
+        SpringApplication.run(ApiGatewayApplication.class);
+
     }
 }

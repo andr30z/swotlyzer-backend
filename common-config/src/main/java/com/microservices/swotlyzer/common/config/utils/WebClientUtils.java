@@ -23,6 +23,6 @@ public class WebClientUtils {
     public static UserHeaderInfo getUserHeadersInfo(HttpServletRequest httpServletRequest) {
         var userIdHeader = httpServletRequest.getHeader(X_AUTH_USER_ID);
         var userLoginHeader = httpServletRequest.getHeader(X_AUTH_USER_LOGIN);
-        return new UserHeaderInfo(Long.parseLong(userIdHeader), userLoginHeader);
+        return new UserHeaderInfo(userIdHeader != null ? Long.parseLong(userIdHeader) : null, userLoginHeader);
     }
 }

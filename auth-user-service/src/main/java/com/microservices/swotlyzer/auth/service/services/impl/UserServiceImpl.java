@@ -11,38 +11,63 @@ import com.microservices.swotlyzer.auth.service.services.UserService;
 import com.microservices.swotlyzer.auth.service.utils.CookieUtil;
 import com.microservices.swotlyzer.common.config.dtos.EmailDTO;
 import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
-import web.error.handling.EntityExistsException;
-import web.error.handling.ResourceNotFoundException;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import web.error.handling.BadRequestException;
+import web.error.handling.EntityExistsException;
+import web.error.handling.ResourceNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.SecureRandom;
 import java.util.Optional;
 
 @Service
+@ComponentScan(basePackages = {"com.microservices.swotlyzer"})
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+
+    @Value("${mail-sender-url}")
+    private String MAIL_SENDER_URL;
 
     private final TokenProvider tokenProvider;
     private final HttpServletRequest httpServletRequest;
     private final WebClient.Builder webClientBuilder;
+
+    private final PasswordEncoder passwordEncoder;
     private final CookieUtil cookieUtil;
 
+    @Autowired
     public UserServiceImpl(UserRepository userRepository, TokenProvider tokenProvider, CookieUtil cookieUtil,
-                           WebClient.Builder webClientBuilder, HttpServletRequest httpServletRequest) {
+                           WebClient.Builder webClientBuilder, HttpServletRequest httpServletRequest, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.tokenProvider = tokenProvider;
         this.httpServletRequest = httpServletRequest;
         this.cookieUtil = cookieUtil;
         this.webClientBuilder = webClientBuilder;
+        this.passwordEncoder = passwordEncoder;
     }
+    public UserServiceImpl(UserRepository userRepository, TokenProvider tokenProvider, CookieUtil cookieUtil,
+                           WebClient.Builder webClientBuilder, HttpServletRequest httpServletRequest,
+                           PasswordEncoder passwordEncoder, String mailSenderUrl) {
+        this.userRepository = userRepository;
+        this.tokenProvider = tokenProvider;
+        this.httpServletRequest = httpServletRequest;
+        this.cookieUtil = cookieUtil;
+        this.webClientBuilder = webClientBuilder;
+        this.passwordEncoder = passwordEncoder;
+        this.MAIL_SENDER_URL = mailSenderUrl;
+    }
+
 
 
     private void sendCreatedUserMail(User user) {
@@ -51,8 +76,8 @@ public class UserServiceImpl implements UserService {
         String CONTENT = "Welcome to our app!";
         EmailDTO emailDTO = EmailDTO.builder().ownerRef(user.getId().toString()).subject(WELCOME).content(CONTENT)
                 .emailFrom(EMAIL_FROM).emailTo(user.getEmail()).build();
-        try {
-            this.webClientBuilder.build().post().uri("http://mail-sender-service/api/v1/email/send")
+       try {
+            this.webClientBuilder.build().post().uri(MAIL_SENDER_URL)
                     .headers(WebClientUtils.setAuthHttpHeaders(httpServletRequest))
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .body(BodyInserters.fromValue(emailDTO)).retrieve().bodyToMono(Object.class).block();
@@ -74,7 +99,7 @@ public class UserServiceImpl implements UserService {
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         User createdUser = this.userRepository.save(user);
-        this.sendCreatedUserMail(createdUser);
+        sendCreatedUserMail(createdUser);
         return createdUser;
     }
 
@@ -82,6 +107,8 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<LoginResponse> login(LoginRequest loginRequest, String accessToken, String refreshToken) {
         String email = loginRequest.getEmail();
         User user = this.findByEmail(email);
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword()))
+            throw new BadRequestException("Password doesn't match!");
         var accessTokenValid = tokenProvider.validateToken(accessToken);
         var refreshTokenValid = tokenProvider.validateToken(refreshToken);
 
@@ -108,7 +135,7 @@ public class UserServiceImpl implements UserService {
         }
 
         LoginResponse loginResponse = new LoginResponse(LoginResponse.SuccessFailure.SUCCESS,
-                "Auth successful. " + "Tokens are created in cookie.");
+                "Auth successful. Tokens are created in cookies.");
         return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
 
     }
@@ -116,12 +143,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<LoginResponse> refresh(String accessToken, String refreshToken) {
         var refreshTokenValid = tokenProvider.validateToken(refreshToken);
-        if (!refreshTokenValid) throw new IllegalArgumentException("Refresh Token is invalid!");
+        if (!refreshTokenValid) throw new BadRequestException("Refresh Token is invalid!");
 
 
         String currentUserEmail = tokenProvider.getUsernameFromToken(refreshToken);
-        System.out.println(currentUserEmail);
-
         Token newAccessToken = tokenProvider.generateAccessToken(currentUserEmail);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add(HttpHeaders.SET_COOKIE,
@@ -129,33 +154,32 @@ public class UserServiceImpl implements UserService {
                         .toString());
 
         LoginResponse loginResponse = new LoginResponse(LoginResponse.SuccessFailure.SUCCESS,
-                "Auth successful. Tokens are created in cookie.");
+                "Auth successful. Tokens are created in cookies.");
         return ResponseEntity.ok().headers(responseHeaders).body(loginResponse);
     }
 
     @Override
     public User getTokenUser(String token) {
         boolean isTokenValid = this.tokenProvider.validateToken(token);
-        if (!isTokenValid) throw new ResourceNotFoundException("");
+        if (!isTokenValid) throw new BadRequestException("Token invalid!");
         var tokenUsername = this.tokenProvider.getUsernameFromToken(token);
         return this.userRepository.findUserByEmail(tokenUsername)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontado para o token informado!"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
     }
 
     @Override
     public User findById(Long id) {
         return this.userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found" + "."));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
     }
 
     @Override
     public User me() {
-        var userIdHeader = httpServletRequest.getHeader("X-auth-user-id");
+        var userIdHeader = httpServletRequest.getHeader(WebClientUtils.X_AUTH_USER_ID);
         if (userIdHeader == null || userIdHeader.trim().length() == 0)
-            throw new ResourceNotFoundException("No users headers could be " + "found");
+            throw new BadRequestException("No user ID headers found!");
         Long currentUserId = Long.parseLong(userIdHeader);
-        var user = this.findById(currentUserId);
-        return user;
+        return this.findById(currentUserId);
     }
 
     private User findByEmail(String email) {
