@@ -161,7 +161,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getTokenUser(String token) {
         boolean isTokenValid = this.tokenProvider.validateToken(token);
-        if (!isTokenValid) throw new ResourceNotFoundException("");
+        if (!isTokenValid) throw new BadRequestException("Token invalid!");
         var tokenUsername = this.tokenProvider.getUsernameFromToken(token);
         return this.userRepository.findUserByEmail(tokenUsername)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found!"));

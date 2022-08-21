@@ -255,8 +255,24 @@ class UserServiceImplTest {
     }
 
     @Test
-    @Disabled
+    @DisplayName("It should return an user by his access token")
     void getTokenUser() {
+        //given
+        String userMail = "testemail@gmail.com";
+        String phone = "61993459845";
+        String password = "123456";
+        String testName = "Test";
+        Long userId = 1L;
+        User user = User.builder().id(userId).name(testName).phone(phone).email(userMail).password(password).build();
+        when(tokenProvider.validateToken(anyString())).thenReturn(true);
+
+        when(tokenProvider.getUsernameFromToken(anyString())).thenReturn(userMail);
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(user));
+
+        var userByToken = underTest.getTokenUser(WANNABE_ACCESS_TOKEN);
+
+        assertThat(userByToken.getId()).isEqualTo(userId);
+
     }
 
     @Test
