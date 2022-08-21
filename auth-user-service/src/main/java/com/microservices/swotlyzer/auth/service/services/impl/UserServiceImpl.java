@@ -12,6 +12,8 @@ import com.microservices.swotlyzer.auth.service.utils.CookieUtil;
 import com.microservices.swotlyzer.common.config.dtos.EmailDTO;
 import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,6 +36,9 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
+    @Value("${mail-sender-url}")
+    private String MAIL_SENDER_URL;
+
     private final TokenProvider tokenProvider;
     private final HttpServletRequest httpServletRequest;
     private final WebClient.Builder webClientBuilder;
@@ -41,6 +46,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final CookieUtil cookieUtil;
 
+    @Autowired
     public UserServiceImpl(UserRepository userRepository, TokenProvider tokenProvider, CookieUtil cookieUtil,
                            WebClient.Builder webClientBuilder, HttpServletRequest httpServletRequest, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -50,6 +56,18 @@ public class UserServiceImpl implements UserService {
         this.webClientBuilder = webClientBuilder;
         this.passwordEncoder = passwordEncoder;
     }
+    public UserServiceImpl(UserRepository userRepository, TokenProvider tokenProvider, CookieUtil cookieUtil,
+                           WebClient.Builder webClientBuilder, HttpServletRequest httpServletRequest,
+                           PasswordEncoder passwordEncoder, String mailSenderUrl) {
+        this.userRepository = userRepository;
+        this.tokenProvider = tokenProvider;
+        this.httpServletRequest = httpServletRequest;
+        this.cookieUtil = cookieUtil;
+        this.webClientBuilder = webClientBuilder;
+        this.passwordEncoder = passwordEncoder;
+        this.MAIL_SENDER_URL = mailSenderUrl;
+    }
+
 
 
     private void sendCreatedUserMail(User user) {
@@ -58,8 +76,8 @@ public class UserServiceImpl implements UserService {
         String CONTENT = "Welcome to our app!";
         EmailDTO emailDTO = EmailDTO.builder().ownerRef(user.getId().toString()).subject(WELCOME).content(CONTENT)
                 .emailFrom(EMAIL_FROM).emailTo(user.getEmail()).build();
-        try {
-            this.webClientBuilder.build().post().uri("http://mail-sender-service/api/v1/email/send")
+       try {
+            this.webClientBuilder.build().post().uri(MAIL_SENDER_URL)
                     .headers(WebClientUtils.setAuthHttpHeaders(httpServletRequest))
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .body(BodyInserters.fromValue(emailDTO)).retrieve().bodyToMono(Object.class).block();

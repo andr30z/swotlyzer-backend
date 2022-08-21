@@ -1,6 +1,8 @@
 .env:
   prefix: ""
 
+mail-sender-url: http://mail-sender-service/api/v1/email/send
+
 server:
   port: 0
 authentication:
