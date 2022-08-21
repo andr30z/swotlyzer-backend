@@ -38,6 +38,7 @@
         <h2.version>1.4.200</h2.version>
         <mock-server.version>4.0.1</mock-server.version>
         <ok-http.version>4.0.1</ok-http.version>
+        <mockito-inline.version>4.7.0</mockito-inline.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -220,11 +221,13 @@
                 <version>${mock-server.version}</version>
                 <scope>test</scope>
             </dependency>
-            <!--            <dependency>-->
-            <!--                <groupId>org.springframework.security</groupId>-->
-            <!--                <artifactId>spring-security-test</artifactId>-->
-            <!--                <scope>test</scope>-->
-            <!--            </dependency>-->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-inline</artifactId>
+                <version>${mockito-inline.version}</version>
+                <scope>test</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
