@@ -3,6 +3,8 @@ package com.microservices.swotlyzer.auth.service.services.impl;
 import com.microservices.swotlyzer.auth.service.dtos.CreateUserDTO;
 import com.microservices.swotlyzer.auth.service.dtos.LoginRequest;
 import com.microservices.swotlyzer.auth.service.dtos.LoginResponse;
+import com.microservices.swotlyzer.auth.service.producers.MailProducer;
+import com.microservices.swotlyzer.common.config.dtos.UserCreatedEvent;
 import com.microservices.swotlyzer.auth.service.models.Token;
 import com.microservices.swotlyzer.auth.service.models.User;
 import com.microservices.swotlyzer.auth.service.repositories.UserRepository;
@@ -16,12 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import web.error.handling.BadRequestException;
 import web.error.handling.EntityExistsException;
@@ -36,54 +37,25 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
-    @Value("${mail-sender-url}")
-    private String MAIL_SENDER_URL;
-
     private final TokenProvider tokenProvider;
     private final HttpServletRequest httpServletRequest;
-    private final WebClient.Builder webClientBuilder;
-
     private final PasswordEncoder passwordEncoder;
     private final CookieUtil cookieUtil;
+    private final MailProducer mailProducer;
 
-    @Autowired
     public UserServiceImpl(UserRepository userRepository, TokenProvider tokenProvider, CookieUtil cookieUtil,
-                           WebClient.Builder webClientBuilder, HttpServletRequest httpServletRequest, PasswordEncoder passwordEncoder) {
+                           HttpServletRequest httpServletRequest,
+                           PasswordEncoder passwordEncoder, MailProducer mailProducer) {
         this.userRepository = userRepository;
         this.tokenProvider = tokenProvider;
         this.httpServletRequest = httpServletRequest;
         this.cookieUtil = cookieUtil;
-        this.webClientBuilder = webClientBuilder;
         this.passwordEncoder = passwordEncoder;
+        this.mailProducer = mailProducer;
     }
-    public UserServiceImpl(UserRepository userRepository, TokenProvider tokenProvider, CookieUtil cookieUtil,
-                           WebClient.Builder webClientBuilder, HttpServletRequest httpServletRequest,
-                           PasswordEncoder passwordEncoder, String mailSenderUrl) {
-        this.userRepository = userRepository;
-        this.tokenProvider = tokenProvider;
-        this.httpServletRequest = httpServletRequest;
-        this.cookieUtil = cookieUtil;
-        this.webClientBuilder = webClientBuilder;
-        this.passwordEncoder = passwordEncoder;
-        this.MAIL_SENDER_URL = mailSenderUrl;
-    }
-
-
 
     private void sendCreatedUserMail(User user) {
-        String EMAIL_FROM = "no.reply.swotlyzer@gmail.com";
-        String WELCOME = "Welcome";
-        String CONTENT = "Welcome to our app!";
-        EmailDTO emailDTO = EmailDTO.builder().ownerRef(user.getId().toString()).subject(WELCOME).content(CONTENT)
-                .emailFrom(EMAIL_FROM).emailTo(user.getEmail()).build();
-       try {
-            this.webClientBuilder.build().post().uri(MAIL_SENDER_URL)
-                    .headers(WebClientUtils.setAuthHttpHeaders(httpServletRequest))
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .body(BodyInserters.fromValue(emailDTO)).retrieve().bodyToMono(Object.class).block();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        mailProducer.sendMessage(new UserCreatedEvent(user.getId(), user.getName(), user.getEmail()));
 
 
     }
