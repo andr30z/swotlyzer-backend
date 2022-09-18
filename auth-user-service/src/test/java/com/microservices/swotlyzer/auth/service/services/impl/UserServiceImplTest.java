@@ -1,27 +1,25 @@
 package com.microservices.swotlyzer.auth.service.services.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microservices.swotlyzer.auth.service.dtos.CreateUserDTO;
 import com.microservices.swotlyzer.auth.service.dtos.LoginRequest;
 import com.microservices.swotlyzer.auth.service.dtos.LoginResponse;
 import com.microservices.swotlyzer.auth.service.models.Token;
 import com.microservices.swotlyzer.auth.service.models.User;
+import com.microservices.swotlyzer.auth.service.producers.MailProducer;
 import com.microservices.swotlyzer.auth.service.repositories.UserRepository;
 import com.microservices.swotlyzer.auth.service.services.TokenProvider;
 import com.microservices.swotlyzer.auth.service.utils.CookieUtil;
-import com.microservices.swotlyzer.common.config.dtos.EmailDTO;
-import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
+import com.microservices.swotlyzer.common.config.dtos.UserCreatedEvent;
 import org.apache.commons.lang.time.DateUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -51,16 +49,15 @@ class UserServiceImplTest {
 
     @Captor
     private ArgumentCaptor<String> accessTokenValueArgumentCaptor;
-
-
-    public static MockWebServer mockEmailWebServer;
+    @Captor
+    private ArgumentCaptor<UserCreatedEvent> userCreatedEvent;
 
     @Mock
     private UserRepository userRepository;
     @Mock
-    private WebClient.RequestBodyUriSpec requestBodyUriSpec;
-    @Mock
     private TokenProvider tokenProvider;
+    @Mock
+    private MailProducer mailProducer;
     @Mock
     private HttpServletRequest httpServletRequest;
     @Mock
@@ -70,8 +67,6 @@ class UserServiceImplTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
-    private MockedStatic<WebClientUtils> webClientUtilsMockedStatic;
-
     private AutoCloseable autoCloseable;
 
     private UserServiceImpl underTest;
@@ -79,22 +74,17 @@ class UserServiceImplTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        mockEmailWebServer = new MockWebServer();
-        mockEmailWebServer.start();
-        mockEmailWebServer.url(MAIL_SERVICE_URL);
 
-        webClientUtilsMockedStatic = mockStatic(WebClientUtils.class);
+
         autoCloseable = MockitoAnnotations.openMocks(this);
-        String url = String.format("http://localhost:%s",
-                mockEmailWebServer.getPort()) + MAIL_SERVICE_URL;
-        underTest = new UserServiceImpl(userRepository, tokenProvider, cookieUtil, webClientBuilder, httpServletRequest,
-                passwordEncoder, url);
+
+        underTest = new UserServiceImpl(userRepository, tokenProvider, cookieUtil,
+                httpServletRequest, passwordEncoder,
+                mailProducer);
     }
 
     @AfterEach
     void tearDown() throws Exception {
-        mockEmailWebServer.shutdown();
-        webClientUtilsMockedStatic.close();
         autoCloseable.close();
     }
 
@@ -112,35 +102,18 @@ class UserServiceImplTest {
                 User.builder().id(userId).name(testName).phone(phone).email(userMail).password(password).build();
 
 
-        String EMAIL_FROM = "no.reply.swotlyzer@gmail.com";
-        String WELCOME = "Welcome";
-        String CONTENT = "Welcome to our app!";
-        EmailDTO emailDTO =
-                EmailDTO.builder().ownerRef(userId.toString()).subject(WELCOME).content(CONTENT).emailFrom(EMAIL_FROM)
-                        .emailTo(userMail).build();
-        ObjectMapper mapper = new ObjectMapper();
         when(userRepository.save(any())).thenReturn(createdUser);
-
-
-        var webClient = WebClient.builder().build();
-
-        //mock for email service request
-        when(webClientBuilder.build()).thenReturn(webClient);
-        // with empty headers
-        when(WebClientUtils.setAuthHttpHeaders(any())).thenReturn(httpHeaders -> {
-        });
-        mockEmailWebServer.enqueue(new MockResponse().setBody(mapper.writeValueAsString(emailDTO))
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+        doNothing().when(mailProducer).sendMessage(any());
 
         underTest.create(new CreateUserDTO(createdUser.getEmail(), createdUser.getName(), createdUser.getPassword(),
                 createdUser.getPhone()));
 
-        verify(userRepository, times(1)).save(userArgumentCaptor.capture());
-        RecordedRequest recordedRequest = mockEmailWebServer.takeRequest();
 
-        //email service validations
-        assertThat(recordedRequest.getMethod()).isEqualTo("POST");
-        assertThat(recordedRequest.getPath()).isEqualTo(MAIL_SERVICE_URL);
+        verify(mailProducer, times(1)).sendMessage(userCreatedEvent.capture());
+
+        verify(userRepository, times(1)).save(userArgumentCaptor.capture());
+
+        assertThat(userCreatedEvent.getValue().getEmail()).isEqualTo(userMail);
 
         //assert that the user created in this method  is the same as to the one captured by userArgumentCaptor
         assertThat(userArgumentCaptor.getValue().getEmail()).isEqualTo(userMail);
