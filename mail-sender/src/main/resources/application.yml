@@ -30,7 +30,16 @@ spring:
         starttls:
           enable: true
 
-
+  kafka:
+    topic:
+      name: mail-sender-topic
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: mail-sender
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties.spring.json.trusted.packages: "*"
 #  spring.mail.host=smtp.gmail.com
 #  spring.mail.port=587
 #  spring.mail.username=${MAIL_SENDER_MAIL_USERNAME}
