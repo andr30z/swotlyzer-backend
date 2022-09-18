@@ -39,6 +39,7 @@
         <mock-server.version>4.0.1</mock-server.version>
         <ok-http.version>4.0.1</ok-http.version>
         <mockito-inline.version>4.7.0</mockito-inline.version>
+        <spring-kafka.version>2.9.0</spring-kafka.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -226,6 +227,11 @@
                 <artifactId>mockito-inline</artifactId>
                 <version>${mockito-inline.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.kafka</groupId>
+                <artifactId>spring-kafka</artifactId>
+                <version>${spring-kafka.version}</version>
             </dependency>
 
         </dependencies>
