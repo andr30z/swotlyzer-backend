@@ -10,15 +10,17 @@ eureka:
       defautlZone: http://eureka:password@localhost:8761/eureka
 
 spring:
+  flyway:
+    baselineOnMigrate: true
+    url: ${MAIL_SENDER_POSTGRESQL_CONNECTION}
+    user: ${MAIL_SENDER_POSTGRESQL_USERNAME}
+    password: ${MAIL_SENDER_POSTGRESQL_PASSWORD}
   application:
     name: mail-sender-service
   datasource:
     url: ${MAIL_SENDER_POSTGRESQL_CONNECTION}
     username: ${MAIL_SENDER_POSTGRESQL_USERNAME}
     password: ${MAIL_SENDER_POSTGRESQL_PASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: update
   mail:
     host: smtp.gmail.com
     port: 587

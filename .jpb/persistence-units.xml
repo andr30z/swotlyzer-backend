@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PersistenceUnitSettings">
+    <persistence-units>
+      <persistence-unit name="Default" defaultSearchScope="Project">
+        <packages>
+          <package value="com.microservices.swotlyzer.auth.service" />
+        </packages>
+      </persistence-unit>
+      <persistence-unit name="postgres-entities">
+        <packages>
+          <package value="com.microservices.swotlyzer" />
+        </packages>
+        <entities>
+          <entity value="com.microservices.swotlyzer.mail.sender.models.Email" />
+        </entities>
+      </persistence-unit>
+    </persistence-units>
+  </component>
+</project>
