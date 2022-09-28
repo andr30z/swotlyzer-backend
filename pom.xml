@@ -40,7 +40,7 @@
         <ok-http.version>4.0.1</ok-http.version>
         <mockito-inline.version>4.7.0</mockito-inline.version>
         <spring-kafka.version>2.9.0</spring-kafka.version>
-        <flyway.version>9.3.1</flyway.version>
+        <flyway.version>8.1.0</flyway.version>
     </properties>
     <dependencyManagement>
         <dependencies>
