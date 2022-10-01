@@ -58,12 +58,13 @@ public class SwotFieldServiceImpl implements SwotFieldService {
 
         swotField.setOwnerId(userHeaderInfo.getUserId());
         SwotField savedSwotField = this.swotFieldRepository.save(swotField);
-        Map<String, List<SwotField>> swotLists = new HashMap<String, List<SwotField>>() {{
-            put(SwotFieldType.WEAKNESS.name(), swotAnalysis.getWeaknesses());
-            put(SwotFieldType.STRENGTH.name(), swotAnalysis.getStrengths());
-            put(SwotFieldType.OPPORTUNITY.name(), swotAnalysis.getOpportunities());
-            put(SwotFieldType.THREAT.name(), swotAnalysis.getThreats());
-        }};
+
+        Map<String, List<SwotField>> swotLists =
+                Map.ofEntries(Map.entry(SwotFieldType.WEAKNESS.name(), swotAnalysis.getWeaknesses()),
+                        Map.entry(SwotFieldType.STRENGTH.name(), swotAnalysis.getStrengths()),
+                        Map.entry(SwotFieldType.OPPORTUNITY.name(), swotAnalysis.getOpportunities()),
+                        Map.entry(SwotFieldType.THREAT.name(), swotAnalysis.getThreats()));
+
         assignSwotField(swotLists, createSwotFieldDTO.getFieldLocation(), savedSwotField);
         swotAnalysisRepository.save(swotAnalysis);
         return savedSwotField;
