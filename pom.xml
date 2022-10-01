@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
     <modules>
-        <module>api-core</module>
+        <module>swot-analysis-service</module>
         <module>mail-sender</module>
         <module>common-config</module>
         <module>discovery-server</module>
@@ -59,7 +59,7 @@
 
             <dependency>
                 <groupId>com.api</groupId>
-                <artifactId>api-core</artifactId>
+                <artifactId>swot-analysis-service</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
