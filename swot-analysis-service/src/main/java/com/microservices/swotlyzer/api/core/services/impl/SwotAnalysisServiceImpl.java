@@ -75,6 +75,13 @@ public class SwotAnalysisServiceImpl implements SwotAnalysisService {
     }
 
     @Override
+    public SuccessDeleteSwotAnalysisDTO deleteSwotAnalysisByCurrentUser(String swotAnalysisId) {
+        var swotAnalysis = getSwotAnalysisByCurrentUser(swotAnalysisId);
+        swotAnalysisRepository.delete(swotAnalysis);
+        return new SuccessDeleteSwotAnalysisDTO("Swot analysis deleted successfully.");
+    }
+
+    @Override
     public SwotAnalysis update(String swotAnalysisId, UpdateSwotAnalysisDTO updateSWOTAnalysisDTO) {
 
         var swotAnalysis = getSwotAnalysisByCurrentUser(swotAnalysisId);

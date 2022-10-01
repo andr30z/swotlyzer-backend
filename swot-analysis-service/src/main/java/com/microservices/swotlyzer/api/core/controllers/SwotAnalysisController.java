@@ -13,8 +13,12 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/swot/api/v1/swot-analysis")
 public class SwotAnalysisController {
-    @Autowired
-    private SwotAnalysisService swotAnalysisService;
+    private final SwotAnalysisService swotAnalysisService;
+
+    public SwotAnalysisController(SwotAnalysisService swotAnalysisService) {
+        this.swotAnalysisService = swotAnalysisService;
+    }
+
 
     @GetMapping("{id}")
     public SwotAnalysis findById(@PathVariable String id) {
@@ -37,5 +41,10 @@ public class SwotAnalysisController {
     public SwotAnalysis update(@PathVariable String id,
                                @Validated @RequestBody UpdateSwotAnalysisDTO updateSWOTAnalysisDTO) {
         return this.swotAnalysisService.update(id, updateSWOTAnalysisDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public SuccessDeleteSwotAnalysisDTO deleteById(@PathVariable String id) {
+        return this.swotAnalysisService.deleteSwotAnalysisByCurrentUser(id);
     }
 }

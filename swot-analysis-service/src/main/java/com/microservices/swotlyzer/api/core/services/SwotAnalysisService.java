@@ -16,4 +16,6 @@ public interface SwotAnalysisService {
     SwotAnalysis update(String swotAnalysisId, UpdateSwotAnalysisDTO updateSWOTAnalysisDTO);
 
     SwotAnalysis getSwotAnalysisByCurrentUser(String swotAnalysisId);
+
+    SuccessDeleteSwotAnalysisDTO deleteSwotAnalysisByCurrentUser(String swotAnalysisId);
 }
