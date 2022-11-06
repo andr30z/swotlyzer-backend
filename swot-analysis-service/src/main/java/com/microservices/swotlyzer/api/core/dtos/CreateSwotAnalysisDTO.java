@@ -20,7 +20,6 @@ public class CreateSwotAnalysisDTO {
 
     private String description;
 
-
     @NotNull(message = "is required.")
     private Boolean swotTemplate;
 
