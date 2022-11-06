@@ -18,10 +18,10 @@ public class SwotField extends BaseEntity{
     private String _id;
 
     private String text;
-    private int fontSize;
+    private Integer fontSize;
     private String fontFamily;
     private String fontWeight;
     private String color;
-
+    private String fontStyle;
     private Long ownerId;
 }

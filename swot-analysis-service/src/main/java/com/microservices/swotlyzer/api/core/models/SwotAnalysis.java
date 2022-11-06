@@ -24,14 +24,10 @@ public class SwotAnalysis extends BaseEntity {
     private SwotLayoutTypes swotLayoutType;
     private boolean swotTemplate;
 
-    @DBRef
-    private List<SwotField> strengths;
-    @DBRef
-    private List<SwotField> weaknesses;
-    @DBRef
-    private List<SwotField> opportunities;
-    @DBRef
-    private List<SwotField> threats;
+    private SwotArea strengths;
+    private SwotArea weaknesses;
+    private SwotArea opportunities;
+    private SwotArea threats;
 
     @NotNull
     private Long ownerId;

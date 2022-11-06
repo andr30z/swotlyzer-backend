@@ -11,10 +11,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping("/swot/api/v1/swot-field")
+@RequestMapping("/api/v1/swot-analysis/swot-field")
 public class SwotFieldController {
-    @Autowired
-    private SwotFieldService swotFieldService;
+
+    private final SwotFieldService swotFieldService;
+
+    public SwotFieldController(SwotFieldService swotFieldService) {
+        this.swotFieldService = swotFieldService;
+    }
 
     @GetMapping("{id}")
     public SwotField findById(@PathVariable String id) {

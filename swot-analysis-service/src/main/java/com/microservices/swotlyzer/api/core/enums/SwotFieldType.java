@@ -4,5 +4,6 @@ public enum SwotFieldType{
     WEAKNESS,
     STRENGTH,
     OPPORTUNITY,
-    THREAT
+    THREAT,
+
 }
