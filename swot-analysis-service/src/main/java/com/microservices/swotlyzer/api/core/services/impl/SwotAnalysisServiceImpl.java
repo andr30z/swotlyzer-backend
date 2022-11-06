@@ -1,6 +1,7 @@
 package com.microservices.swotlyzer.api.core.services.impl;
 
 import com.microservices.swotlyzer.api.core.dtos.*;
+import com.microservices.swotlyzer.api.core.models.SwotArea;
 import com.microservices.swotlyzer.api.core.utils.*;
 import com.microservices.swotlyzer.api.core.dtos.UpdateSwotAnalysisDTO;
 import com.microservices.swotlyzer.api.core.models.SwotAnalysis;
@@ -49,10 +50,15 @@ public class SwotAnalysisServiceImpl implements SwotAnalysisService {
     public SwotAnalysis create(CreateSwotAnalysisDTO createSWOTAnalysisDTO) {
 
         SwotAnalysis swotAnalysis = new SwotAnalysis();
-        swotAnalysis.setWeaknesses(Collections.emptyList());
-        swotAnalysis.setStrengths(Collections.emptyList());
-        swotAnalysis.setThreats(Collections.emptyList());
-        swotAnalysis.setOpportunities(Collections.emptyList());
+        var swotStrengthsArea = new SwotArea("Strengths", "green", Collections.emptySet());
+        var swotOpportunitiesArea = new SwotArea("Opportunities", "blue", Collections.emptySet());
+        var swotWeaknesssArea = new SwotArea("Weaknesses", "red", Collections.emptySet());
+        var swotThreatsArea = new SwotArea("Threats", "grey", Collections.emptySet());
+
+        swotAnalysis.setWeaknesses(swotWeaknesssArea);
+        swotAnalysis.setStrengths(swotStrengthsArea);
+        swotAnalysis.setThreats(swotThreatsArea);
+        swotAnalysis.setOpportunities(swotOpportunitiesArea);
         BeanUtils.copyProperties(createSWOTAnalysisDTO, swotAnalysis);
 
         var userHeaderInfo = WebClientUtils.getUserHeadersInfo(httpServletRequest);

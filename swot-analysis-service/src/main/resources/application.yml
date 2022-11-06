@@ -22,7 +22,7 @@ spring:
       matching-strategy: ant_path_matcher
   application:
 
-    name: api-core-service
+    name: swot-analysis-service
 
   data:
     mongodb:
@@ -31,7 +31,6 @@ spring:
     locale: en
 
   jackson:
-    date-format: yyyy-MM-dd
     serialization:
       write_dates_as_timestamps: false
 server:

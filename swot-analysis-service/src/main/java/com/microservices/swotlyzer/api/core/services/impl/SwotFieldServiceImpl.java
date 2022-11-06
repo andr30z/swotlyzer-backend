@@ -5,6 +5,7 @@ import com.microservices.swotlyzer.api.core.dtos.SwotFieldDeleteResponse;
 import com.microservices.swotlyzer.api.core.dtos.UpdateSwotFieldDTO;
 import com.microservices.swotlyzer.api.core.enums.SwotFieldType;
 import com.microservices.swotlyzer.api.core.models.SwotAnalysis;
+import com.microservices.swotlyzer.api.core.models.SwotArea;
 import com.microservices.swotlyzer.api.core.models.SwotField;
 import com.microservices.swotlyzer.api.core.repositories.SwotAnalysisRepository;
 import com.microservices.swotlyzer.api.core.repositories.SwotFieldRepository;
@@ -14,6 +15,7 @@ import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import web.error.handling.BadRequestException;
 import web.error.handling.OperationNotAllowedException;
 import web.error.handling.ResourceNotFoundException;
 
@@ -59,19 +61,25 @@ public class SwotFieldServiceImpl implements SwotFieldService {
         swotField.setOwnerId(userHeaderInfo.getUserId());
         SwotField savedSwotField = this.swotFieldRepository.save(swotField);
 
-        Map<String, List<SwotField>> swotLists =
-                Map.ofEntries(Map.entry(SwotFieldType.WEAKNESS.name(), swotAnalysis.getWeaknesses()),
-                        Map.entry(SwotFieldType.STRENGTH.name(), swotAnalysis.getStrengths()),
-                        Map.entry(SwotFieldType.OPPORTUNITY.name(), swotAnalysis.getOpportunities()),
-                        Map.entry(SwotFieldType.THREAT.name(), swotAnalysis.getThreats()));
+        Map<SwotFieldType, SwotArea> swotAreasMap =
+                Map.ofEntries(Map.entry(SwotFieldType.WEAKNESS, swotAnalysis.getWeaknesses()),
+                        Map.entry(SwotFieldType.STRENGTH, swotAnalysis.getStrengths()),
+                        Map.entry(SwotFieldType.OPPORTUNITY, swotAnalysis.getOpportunities()),
+                        Map.entry(SwotFieldType.THREAT, swotAnalysis.getThreats()));
 
-        assignSwotField(swotLists, createSwotFieldDTO.getFieldLocation(), savedSwotField);
+        assignSwotField(swotAreasMap, createSwotFieldDTO.getFieldLocation(), savedSwotField);
         swotAnalysisRepository.save(swotAnalysis);
         return savedSwotField;
     }
 
-    private void assignSwotField(Map<String, List<SwotField>> map, String operationPosition, SwotField swotField) {
-        map.get(operationPosition).add(swotField);
+    private void assignSwotField(Map<SwotFieldType, SwotArea> map, String operationPosition,
+                                 SwotField swotField) {
+        try {
+            SwotArea area = map.get(SwotFieldType.valueOf(operationPosition));
+            area.getFields().add(swotField);
+        } catch (IllegalArgumentException _e) {
+            throw new BadRequestException("Swot field location doesn't exists!");
+        }
     }
 
     @Override
