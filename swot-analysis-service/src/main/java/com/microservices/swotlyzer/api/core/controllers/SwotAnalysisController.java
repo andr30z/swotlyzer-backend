@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping("/swot/api/v1/swot-analysis")
+@RequestMapping("/api/v1/swot-analysis")
 public class SwotAnalysisController {
     private final SwotAnalysisService swotAnalysisService;
 

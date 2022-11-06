@@ -69,8 +69,6 @@ public class AuthFilter extends AbstractGatewayFilterFactory<AuthFilter.Config> 
                         if (userOrBoolean.getClass() != BaseUser.class)
                             return this.onError(exchange, "api-key missing", HttpStatus.UNAUTHORIZED);
                         BaseUser user = (BaseUser) userOrBoolean;
-                        System.out.println(userOrBoolean);
-                        System.out.println("bosta");
                         exchange.getRequest().mutate()
                                 //adicionando os headers de usuário para a requisição
                                 .header(WebClientUtils.X_AUTH_USER_LOGIN, user.getEmail())
