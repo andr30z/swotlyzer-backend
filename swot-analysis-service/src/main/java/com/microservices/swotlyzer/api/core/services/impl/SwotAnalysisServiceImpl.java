@@ -1,12 +1,14 @@
 package com.microservices.swotlyzer.api.core.services.impl;
 
-import com.microservices.swotlyzer.api.core.dtos.*;
-import com.microservices.swotlyzer.api.core.models.SwotArea;
-import com.microservices.swotlyzer.api.core.utils.*;
+import com.microservices.swotlyzer.api.core.dtos.CreateSwotAnalysisDTO;
+import com.microservices.swotlyzer.api.core.dtos.PaginationResponse;
+import com.microservices.swotlyzer.api.core.dtos.SuccessDeleteSwotAnalysisDTO;
 import com.microservices.swotlyzer.api.core.dtos.UpdateSwotAnalysisDTO;
 import com.microservices.swotlyzer.api.core.models.SwotAnalysis;
+import com.microservices.swotlyzer.api.core.models.SwotArea;
 import com.microservices.swotlyzer.api.core.repositories.SwotAnalysisRepository;
 import com.microservices.swotlyzer.api.core.services.SwotAnalysisService;
+import com.microservices.swotlyzer.api.core.utils.PaginationUtil;
 import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -40,7 +42,6 @@ public class SwotAnalysisServiceImpl implements SwotAnalysisService {
     @Override
     public PaginationResponse<SwotAnalysis> findByCurrentUser(int page, int perPage) {
         Pageable paging = PageRequest.of(page - 1, perPage);
-
         var userHeaderInfo = WebClientUtils.getUserHeadersInfo(httpServletRequest);
         Page<SwotAnalysis> swotPage = this.swotAnalysisRepository.findByOwnerId(userHeaderInfo.getUserId(), paging);
         return new PaginationUtil<SwotAnalysis, SwotAnalysisRepository>().buildResponse(swotPage);
@@ -52,10 +53,10 @@ public class SwotAnalysisServiceImpl implements SwotAnalysisService {
         SwotAnalysis swotAnalysis = new SwotAnalysis();
         var swotStrengthsArea = new SwotArea("Strengths", "green", Collections.emptySet());
         var swotOpportunitiesArea = new SwotArea("Opportunities", "blue", Collections.emptySet());
-        var swotWeaknesssArea = new SwotArea("Weaknesses", "red", Collections.emptySet());
+        var swotWeaknessesArea = new SwotArea("Weaknesses", "red", Collections.emptySet());
         var swotThreatsArea = new SwotArea("Threats", "grey", Collections.emptySet());
 
-        swotAnalysis.setWeaknesses(swotWeaknesssArea);
+        swotAnalysis.setWeaknesses(swotWeaknessesArea);
         swotAnalysis.setStrengths(swotStrengthsArea);
         swotAnalysis.setThreats(swotThreatsArea);
         swotAnalysis.setOpportunities(swotOpportunitiesArea);
