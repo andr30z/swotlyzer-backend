@@ -2,6 +2,7 @@ package com.microservices.swotlyzer.swot.analysis.service.services.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -29,9 +30,13 @@ import com.microservices.swotlyzer.swot.analysis.service.models.SwotAnalysis;
 import com.microservices.swotlyzer.swot.analysis.service.models.SwotArea;
 import com.microservices.swotlyzer.swot.analysis.service.models.SwotLayoutTypes;
 import com.microservices.swotlyzer.swot.analysis.service.repositories.SwotAnalysisRepository;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import web.error.handling.BadRequestException;
 
 @ExtendWith(MockitoExtension.class)
 public class SwotAnalysisServiceImplTest {
+
+    private final UserHeaderInfo currentLoggedUser = new UserHeaderInfo(1L, "TESTU_SER");
 
     @Mock
     private SwotAnalysisRepository swotAnalysisRepository;
@@ -61,13 +66,32 @@ public class SwotAnalysisServiceImplTest {
     }
 
     @Test
+    @DisplayName("It Should find swot analysis owned by the current logged user.")
+    void itShouldFindByCurrentUser() {
+
+    }
+
+    @Test
+    // Damn that's a long name
+    void itShouldThrowErrorIfPageOrPerPageQuantitiesAreInvalidForFindSwotAnalysisByCurrentUser() {
+
+        when(WebClientUtils.getUserHeadersInfo(any())).thenReturn(currentLoggedUser);
+       
+        assertThatThrownBy(() -> underTest.findByCurrentUser(-1, -1))
+        .isInstanceOf(BadRequestException.class)
+        .hasMessageContaining("Invalid quantity for page or per page!");
+       
+        verify(swotAnalysisRepository, times(0)).findByOwnerId(anyLong(), any());
+
+        
+    }
+
+    @Test
     @DisplayName("It Should Create a SwotAnalysis.")
     void itShouldCreateASwotAnalysis() {
         var swotDescription = "Swot Description";
         var layoutType = SwotLayoutTypes.DEFAULT.name();
         var swotTitle = "Swot Title";
-        var currentLoggedUserId = 1L;
-        var currentLoggedUsername = "Test_User";
         var createSwotAnalysisDTO = CreateSwotAnalysisDTO.builder().swotTemplate(true).description(swotDescription)
                 .layoutType(layoutType)
                 .title(swotTitle).build();
@@ -79,16 +103,16 @@ public class SwotAnalysisServiceImplTest {
 
         var mockedSwotAnalysis = new SwotAnalysis("1", swotTitle, SwotLayoutTypes.DEFAULT, true,
                 swotStrengthsArea, swotWeaknessesArea,
-                swotOpportunitiesArea, swotThreatsArea, currentLoggedUserId);
+                swotOpportunitiesArea, swotThreatsArea, currentLoggedUser.getUserId());
         when(swotAnalysisRepository.save(any())).thenReturn(mockedSwotAnalysis);
 
         when(WebClientUtils.getUserHeadersInfo(any()))
-                .thenReturn(new UserHeaderInfo(currentLoggedUserId, currentLoggedUsername));
+                .thenReturn(currentLoggedUser);
 
         SwotAnalysis newlyCreatedSwotAnalysis = underTest.create(createSwotAnalysisDTO);
 
         verify(swotAnalysisRepository, times(1)).save(any());
-        assertEquals(newlyCreatedSwotAnalysis.getOwnerId(), mockedSwotAnalysis.getOwnerId());
+        assertEquals(newlyCreatedSwotAnalysis.getOwnerId(), currentLoggedUser.getUserId());
         assertEquals(newlyCreatedSwotAnalysis, mockedSwotAnalysis);
     }
 }

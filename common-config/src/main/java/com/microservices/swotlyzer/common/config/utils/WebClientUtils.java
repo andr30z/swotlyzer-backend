@@ -1,11 +1,12 @@
 package com.microservices.swotlyzer.common.config.utils;
 
-import com.microservices.swotlyzer.common.config.dtos.UserHeaderInfo;
-import org.springframework.http.HttpHeaders;
-import org.springframework.web.server.ServerWebExchange;
+import java.util.function.Consumer;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.function.Consumer;
+
+import org.springframework.http.HttpHeaders;
+
+import com.microservices.swotlyzer.common.config.dtos.UserHeaderInfo;
 
 public class WebClientUtils {
 

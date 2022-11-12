@@ -16,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import web.error.handling.BadRequestException;
 import web.error.handling.OperationNotAllowedException;
 import web.error.handling.ResourceNotFoundException;
 
@@ -42,6 +44,7 @@ public class SwotAnalysisServiceImpl implements SwotAnalysisService {
 
     @Override
     public PaginationResponse<SwotAnalysis> findByCurrentUser(int page, int perPage) {
+        if(page < 0 || perPage < 1) throw new BadRequestException("Invalid quantity for page or per page!");
         Pageable paging = PageRequest.of(page - 1, perPage);
         UserHeaderInfo userHeaderInfo = WebClientUtils.getUserHeadersInfo(httpServletRequest);
         Page<SwotAnalysis> swotPage = this.swotAnalysisRepository.findByOwnerId(userHeaderInfo.getUserId(), paging);
