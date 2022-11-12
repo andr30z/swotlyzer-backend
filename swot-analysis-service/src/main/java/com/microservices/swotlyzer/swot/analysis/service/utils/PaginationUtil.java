@@ -1,6 +1,5 @@
 package com.microservices.swotlyzer.swot.analysis.service.utils;
 
-import com.microservices.swotlyzer.api.core.dtos.*;
 import com.microservices.swotlyzer.swot.analysis.service.dtos.PaginationResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

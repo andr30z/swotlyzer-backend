@@ -1,17 +1,22 @@
 package com.microservices.swotlyzer.swot.analysis.service.dtos;
 
-import com.microservices.swotlyzer.swot.analysis.service.models.SwotLayoutTypes;
-import com.microservices.swotlyzer.swot.analysis.service.validations.ValueOfEnum;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Data
+import com.microservices.swotlyzer.swot.analysis.service.models.SwotLayoutTypes;
+import com.microservices.swotlyzer.swot.analysis.service.validations.ValueOfEnum;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class CreateSwotAnalysisDTO {
 
     @NotBlank(message = "is blank.")

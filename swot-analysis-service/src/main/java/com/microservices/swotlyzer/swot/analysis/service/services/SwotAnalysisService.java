@@ -1,7 +1,6 @@
 package com.microservices.swotlyzer.swot.analysis.service.services;
 
 
-import com.microservices.swotlyzer.api.core.dtos.*;
 import com.microservices.swotlyzer.swot.analysis.service.dtos.CreateSwotAnalysisDTO;
 import com.microservices.swotlyzer.swot.analysis.service.dtos.PaginationResponse;
 import com.microservices.swotlyzer.swot.analysis.service.dtos.SuccessDeleteSwotAnalysisDTO;

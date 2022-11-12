@@ -22,7 +22,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.reactive.function.client.WebClient;
 import web.error.handling.BadRequestException;
 import web.error.handling.EntityExistsException;
 import web.error.handling.ResourceNotFoundException;
@@ -39,7 +38,6 @@ import static org.mockito.Mockito.*;
 class UserServiceImplTest {
 
     public static final String WANNABE_ACCESS_TOKEN = "WANNABE_ACCESS_TOKEN";
-    public static final String MAIL_SERVICE_URL = "/api/v1/email/send";
 
     @Captor
     private ArgumentCaptor<User> userArgumentCaptor;
@@ -60,8 +58,6 @@ class UserServiceImplTest {
     private MailProducer mailProducer;
     @Mock
     private HttpServletRequest httpServletRequest;
-    @Mock
-    private WebClient.Builder webClientBuilder;
     @Mock
     private CookieUtil cookieUtil;
     @Mock

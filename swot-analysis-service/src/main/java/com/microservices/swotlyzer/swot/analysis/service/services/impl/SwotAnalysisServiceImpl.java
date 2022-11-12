@@ -9,6 +9,7 @@ import com.microservices.swotlyzer.swot.analysis.service.models.SwotArea;
 import com.microservices.swotlyzer.swot.analysis.service.repositories.SwotAnalysisRepository;
 import com.microservices.swotlyzer.swot.analysis.service.services.SwotAnalysisService;
 import com.microservices.swotlyzer.swot.analysis.service.utils.PaginationUtil;
+import com.microservices.swotlyzer.common.config.dtos.UserHeaderInfo;
 import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -28,7 +29,7 @@ public class SwotAnalysisServiceImpl implements SwotAnalysisService {
     private final HttpServletRequest httpServletRequest;
 
     public SwotAnalysisServiceImpl(SwotAnalysisRepository swotAnalysisRepository,
-                                   HttpServletRequest httpServletRequest) {
+            HttpServletRequest httpServletRequest) {
         this.swotAnalysisRepository = swotAnalysisRepository;
         this.httpServletRequest = httpServletRequest;
     }
@@ -42,7 +43,7 @@ public class SwotAnalysisServiceImpl implements SwotAnalysisService {
     @Override
     public PaginationResponse<SwotAnalysis> findByCurrentUser(int page, int perPage) {
         Pageable paging = PageRequest.of(page - 1, perPage);
-        var userHeaderInfo = WebClientUtils.getUserHeadersInfo(httpServletRequest);
+        UserHeaderInfo userHeaderInfo = WebClientUtils.getUserHeadersInfo(httpServletRequest);
         Page<SwotAnalysis> swotPage = this.swotAnalysisRepository.findByOwnerId(userHeaderInfo.getUserId(), paging);
         return new PaginationUtil<SwotAnalysis, SwotAnalysisRepository>().buildResponse(swotPage);
     }
@@ -62,7 +63,7 @@ public class SwotAnalysisServiceImpl implements SwotAnalysisService {
         swotAnalysis.setOpportunities(swotOpportunitiesArea);
         BeanUtils.copyProperties(createSWOTAnalysisDTO, swotAnalysis);
 
-        var userHeaderInfo = WebClientUtils.getUserHeadersInfo(httpServletRequest);
+        UserHeaderInfo userHeaderInfo = WebClientUtils.getUserHeadersInfo(httpServletRequest);
         Long currentUserId = userHeaderInfo.getUserId();
         swotAnalysis.setOwnerId(currentUserId);
         swotAnalysis.setSwotLayoutType(createSWOTAnalysisDTO.getLayoutType());
@@ -75,9 +76,10 @@ public class SwotAnalysisServiceImpl implements SwotAnalysisService {
                 .orElseThrow(() -> new ResourceNotFoundException("SWOT Analysis don't exist."));
         var userHeaderInfo = WebClientUtils.getUserHeadersInfo(httpServletRequest);
         Long currentUserId = userHeaderInfo.getUserId();
-        if (!Objects.equals(swotAnalysis.getOwnerId(), currentUserId)) throw new OperationNotAllowedException(
-                "SWOT Analysis with _id: " + swotAnalysisId + " don't belongs to user with " + "id: " +
-                        currentUserId);
+        if (!Objects.equals(swotAnalysis.getOwnerId(), currentUserId))
+            throw new OperationNotAllowedException(
+                    "SWOT Analysis with _id: " + swotAnalysisId + " doesn't belongs to user with " + "id: " +
+                            currentUserId);
         return swotAnalysis;
     }
 
@@ -94,7 +96,6 @@ public class SwotAnalysisServiceImpl implements SwotAnalysisService {
         var swotAnalysis = getSwotAnalysisByCurrentUser(swotAnalysisId);
         BeanUtils.copyProperties(updateSWOTAnalysisDTO, swotAnalysis);
         swotAnalysis.setSwotLayoutType(updateSWOTAnalysisDTO.getLayoutType());
-
 
         return this.swotAnalysisRepository.save(swotAnalysis);
     }
