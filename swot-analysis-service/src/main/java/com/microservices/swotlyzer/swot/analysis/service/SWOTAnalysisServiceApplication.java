@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableMongoAuditing
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
 @EnableEurekaClient
-@EnableMongoRepositories(basePackages = "com.microservices.swotlyzer.api.core.repositories")
+@EnableMongoRepositories
 @ComponentScan(basePackages = "com.microservices.swotlyzer")
 public class SWOTAnalysisServiceApplication {
 

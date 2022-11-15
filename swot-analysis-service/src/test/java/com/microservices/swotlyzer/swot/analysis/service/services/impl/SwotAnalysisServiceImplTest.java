@@ -1,5 +1,6 @@
 package com.microservices.swotlyzer.swot.analysis.service.services.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,13 +12,13 @@ import static org.mockito.Mockito.when;
 
 import com.microservices.swotlyzer.common.config.dtos.UserHeaderInfo;
 import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
+import com.microservices.swotlyzer.swot.Utils.GenerateSwotAnalysis;
 import com.microservices.swotlyzer.swot.analysis.service.dtos.CreateSwotAnalysisDTO;
+import com.microservices.swotlyzer.swot.analysis.service.dtos.PaginationResponse;
 import com.microservices.swotlyzer.swot.analysis.service.models.SwotAnalysis;
-import com.microservices.swotlyzer.swot.analysis.service.models.SwotArea;
 import com.microservices.swotlyzer.swot.analysis.service.models.SwotLayoutTypes;
 import com.microservices.swotlyzer.swot.analysis.service.repositories.SwotAnalysisRepository;
 import java.io.IOException;
-import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import web.error.handling.BadRequestException;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,8 +40,11 @@ public class SwotAnalysisServiceImplTest {
     "TEST_USER"
   );
 
+  @Autowired
+  SwotAnalysisRepository swotAnalysisRepository;
+
   @Mock
-  private SwotAnalysisRepository swotAnalysisRepository;
+  private SwotAnalysisRepository mockSwotAnalysisRepository;
 
   @Mock
   private HttpServletRequest httpServletRequest;
@@ -57,7 +62,10 @@ public class SwotAnalysisServiceImplTest {
     autoCloseable = MockitoAnnotations.openMocks(this);
 
     underTest =
-      new SwotAnalysisServiceImpl(swotAnalysisRepository, httpServletRequest);
+      new SwotAnalysisServiceImpl(
+        mockSwotAnalysisRepository,
+        httpServletRequest
+      );
   }
 
   @AfterEach
@@ -68,7 +76,35 @@ public class SwotAnalysisServiceImplTest {
 
   @Test
   @DisplayName("It Should find swot analysis owned by the current logged user.")
-  void itShouldFindByCurrentUser() {}
+  void itShouldFindByCurrentUser() {
+    //saving in real repository
+    SwotAnalysis swotAnalysisCurrentUser = GenerateSwotAnalysis.generateSwotAnalysis(
+      currentLoggedUser.getUserId(),
+      "1000"
+    );
+    SwotAnalysis swotAnalysisNotCurrentUser = GenerateSwotAnalysis.generateSwotAnalysis(
+      999L,
+      "222"
+    );
+    swotAnalysisRepository.save(swotAnalysisCurrentUser);
+    swotAnalysisRepository.save(swotAnalysisNotCurrentUser);
+
+    when(WebClientUtils.getUserHeadersInfo(any()))
+      .thenReturn(currentLoggedUser);
+
+    PaginationResponse<SwotAnalysis> PaginationResponse = underTest.findByCurrentUser(
+      5,
+      5
+    );
+
+    verify(swotAnalysisRepository, times(1)).findByOwnerId(anyLong(), any());
+    assertThat(PaginationResponse.getData())
+      .hasSize(1)
+      .extracting("owerId")
+      .contains(1L)
+      .doesNotContain(99L);
+    // assertEquals(PaginationResponse.getData()., null);
+  }
 
   @Test
   // Damn that's a long name
@@ -80,7 +116,8 @@ public class SwotAnalysisServiceImplTest {
       .isInstanceOf(BadRequestException.class)
       .hasMessageContaining("Invalid quantity for page or per page!");
 
-    verify(swotAnalysisRepository, times(0)).findByOwnerId(anyLong(), any());
+    verify(mockSwotAnalysisRepository, times(0))
+      .findByOwnerId(anyLong(), any());
   }
 
   @Test
@@ -97,39 +134,11 @@ public class SwotAnalysisServiceImplTest {
       .title(swotTitle)
       .build();
 
-    var swotStrengthsArea = new SwotArea(
-      "Strengths",
-      "green",
-      Collections.emptySet()
+    SwotAnalysis mockedSwotAnalysis = GenerateSwotAnalysis.generateSwotAnalysis(
+      currentLoggedUser.getUserId(),
+      "1000"
     );
-    var swotOpportunitiesArea = new SwotArea(
-      "Opportunities",
-      "blue",
-      Collections.emptySet()
-    );
-    var swotWeaknessesArea = new SwotArea(
-      "Weaknesses",
-      "red",
-      Collections.emptySet()
-    );
-    var swotThreatsArea = new SwotArea(
-      "Threats",
-      "grey",
-      Collections.emptySet()
-    );
-
-    var mockedSwotAnalysis = new SwotAnalysis(
-      "1",
-      swotTitle,
-      SwotLayoutTypes.DEFAULT,
-      true,
-      swotStrengthsArea,
-      swotWeaknessesArea,
-      swotOpportunitiesArea,
-      swotThreatsArea,
-      currentLoggedUser.getUserId()
-    );
-    when(swotAnalysisRepository.save(any())).thenReturn(mockedSwotAnalysis);
+    when(mockSwotAnalysisRepository.save(any())).thenReturn(mockedSwotAnalysis);
 
     when(WebClientUtils.getUserHeadersInfo(any()))
       .thenReturn(currentLoggedUser);
@@ -138,7 +147,7 @@ public class SwotAnalysisServiceImplTest {
       createSwotAnalysisDTO
     );
 
-    verify(swotAnalysisRepository, times(1)).save(any());
+    verify(mockSwotAnalysisRepository, times(1)).save(any());
     assertEquals(
       newlyCreatedSwotAnalysis.getOwnerId(),
       currentLoggedUser.getUserId()
