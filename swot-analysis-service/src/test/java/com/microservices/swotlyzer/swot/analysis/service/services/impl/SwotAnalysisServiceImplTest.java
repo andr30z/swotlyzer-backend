@@ -19,17 +19,22 @@ import com.microservices.swotlyzer.swot.analysis.service.models.SwotAnalysis;
 import com.microservices.swotlyzer.swot.analysis.service.models.SwotLayoutTypes;
 import com.microservices.swotlyzer.swot.analysis.service.repositories.SwotAnalysisRepository;
 import java.io.IOException;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import web.error.handling.BadRequestException;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,11 +45,11 @@ public class SwotAnalysisServiceImplTest {
     "TEST_USER"
   );
 
-  @Autowired
-  SwotAnalysisRepository swotAnalysisRepository;
-
   @Mock
-  private SwotAnalysisRepository mockSwotAnalysisRepository;
+  private SwotAnalysisRepository swotAnalysisRepository;
+
+  @Captor
+  private ArgumentCaptor<Pageable> pageableArgumentCaptor;
 
   @Mock
   private HttpServletRequest httpServletRequest;
@@ -62,10 +67,7 @@ public class SwotAnalysisServiceImplTest {
     autoCloseable = MockitoAnnotations.openMocks(this);
 
     underTest =
-      new SwotAnalysisServiceImpl(
-        mockSwotAnalysisRepository,
-        httpServletRequest
-      );
+      new SwotAnalysisServiceImpl(swotAnalysisRepository, httpServletRequest);
   }
 
   @AfterEach
@@ -75,35 +77,36 @@ public class SwotAnalysisServiceImplTest {
   }
 
   @Test
-  @DisplayName("It Should find swot analysis owned by the current logged user.")
+  @DisplayName("It Should find swot analyses owned by the logged user.")
   void itShouldFindByCurrentUser() {
     //saving in real repository
     SwotAnalysis swotAnalysisCurrentUser = GenerateSwotAnalysis.generateSwotAnalysis(
       currentLoggedUser.getUserId(),
       "1000"
     );
-    SwotAnalysis swotAnalysisNotCurrentUser = GenerateSwotAnalysis.generateSwotAnalysis(
-      999L,
-      "222"
-    );
-    swotAnalysisRepository.save(swotAnalysisCurrentUser);
-    swotAnalysisRepository.save(swotAnalysisNotCurrentUser);
 
     when(WebClientUtils.getUserHeadersInfo(any()))
       .thenReturn(currentLoggedUser);
 
-    PaginationResponse<SwotAnalysis> PaginationResponse = underTest.findByCurrentUser(
-      5,
-      5
-    );
+    when(swotAnalysisRepository.findByOwnerId(anyLong(), any()))
+      .thenReturn(
+        new PageImpl<SwotAnalysis>(
+          List.of(swotAnalysisCurrentUser),
+          PageRequest.of(0, 1),
+          1
+        )
+      );
 
-    verify(swotAnalysisRepository, times(1)).findByOwnerId(anyLong(), any());
-    assertThat(PaginationResponse.getData())
-      .hasSize(1)
-      .extracting("owerId")
-      .contains(1L)
-      .doesNotContain(99L);
-    // assertEquals(PaginationResponse.getData()., null);
+    underTest.findByCurrentUser(1, 5);
+
+    verify(swotAnalysisRepository, times(1))
+      .findByOwnerId(anyLong(), pageableArgumentCaptor.capture());
+
+    Pageable pageable = pageableArgumentCaptor.getValue();
+
+    //testing for 0 because the index for database pageable queries starts at 0 and I'm passing 1 as page (1-1 = first page)
+    assertEquals(pageable.getPageNumber(), 0);
+    assertEquals(pageable.getPageSize(), 5);
   }
 
   @Test
@@ -116,8 +119,7 @@ public class SwotAnalysisServiceImplTest {
       .isInstanceOf(BadRequestException.class)
       .hasMessageContaining("Invalid quantity for page or per page!");
 
-    verify(mockSwotAnalysisRepository, times(0))
-      .findByOwnerId(anyLong(), any());
+    verify(swotAnalysisRepository, times(0)).findByOwnerId(anyLong(), any());
   }
 
   @Test
@@ -138,7 +140,7 @@ public class SwotAnalysisServiceImplTest {
       currentLoggedUser.getUserId(),
       "1000"
     );
-    when(mockSwotAnalysisRepository.save(any())).thenReturn(mockedSwotAnalysis);
+    when(swotAnalysisRepository.save(any())).thenReturn(mockedSwotAnalysis);
 
     when(WebClientUtils.getUserHeadersInfo(any()))
       .thenReturn(currentLoggedUser);
@@ -147,7 +149,8 @@ public class SwotAnalysisServiceImplTest {
       createSwotAnalysisDTO
     );
 
-    verify(mockSwotAnalysisRepository, times(1)).save(any());
+    verify(swotAnalysisRepository, times(1)).save(any());
+
     assertEquals(
       newlyCreatedSwotAnalysis.getOwnerId(),
       currentLoggedUser.getUserId()
