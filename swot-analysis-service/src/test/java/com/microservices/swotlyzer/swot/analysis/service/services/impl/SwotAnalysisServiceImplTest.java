@@ -39,6 +39,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import web.error.handling.BadRequestException;
+import web.error.handling.ResourceNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class SwotAnalysisServiceImplTest {
@@ -105,6 +106,26 @@ public class SwotAnalysisServiceImplTest {
       swotAnalysisCurrentUser.get_id()
     );
     assertEquals(swotAnalysis, swotAnalysisCurrentUser);
+  }
+
+  @Test
+  @DisplayName(
+    "It should throw an error when a swot analysis is not owned by the current user"
+  )
+  public void itShouldThrowErrorWhenSwotAnalysisByIsNotOwnedByTheCurrentUser() {
+    when(WebClientUtils.getUserHeadersInfo(any()))
+      .thenReturn(currentLoggedUser);
+
+    when(swotAnalysisRepository.findBy_idAndOwnerId(anyString(), anyLong()))
+      .thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> underTest.getSwotAnalysisByCurrentUser("9999"))
+      .isInstanceOf(ResourceNotFoundException.class)
+      .hasMessageContaining(
+        "SWOT Analysis doesn't exist or doesn't" +
+        "belongs to user with id: " +
+        currentLoggedUser.getUserId()
+      );
   }
 
   @Test
