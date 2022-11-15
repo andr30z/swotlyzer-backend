@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,6 +22,7 @@ import com.microservices.swotlyzer.swot.analysis.service.models.SwotLayoutTypes;
 import com.microservices.swotlyzer.swot.analysis.service.repositories.SwotAnalysisRepository;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +54,9 @@ public class SwotAnalysisServiceImplTest {
   @Captor
   private ArgumentCaptor<Pageable> pageableArgumentCaptor;
 
+  @Captor
+  private ArgumentCaptor<String> stringArgumentCaptor;
+
   @Mock
   private HttpServletRequest httpServletRequest;
 
@@ -74,6 +80,56 @@ public class SwotAnalysisServiceImplTest {
   void tearDown() throws Exception {
     webClientStaticMocked.close();
     autoCloseable.close();
+  }
+
+  @Test
+  @DisplayName("It should find a swot analysis of the current user")
+  public void itShouldFindASwotAnalysisByTheCurrentUser() {
+    SwotAnalysis swotAnalysisCurrentUser = GenerateSwotAnalysis.generateSwotAnalysis(
+      currentLoggedUser.getUserId(),
+      "1000"
+    );
+    when(WebClientUtils.getUserHeadersInfo(any()))
+      .thenReturn(currentLoggedUser);
+
+    when(swotAnalysisRepository.findBy_idAndOwnerId(anyString(), anyLong()))
+      .thenReturn(Optional.of(swotAnalysisCurrentUser));
+
+    SwotAnalysis swotAnalysis = underTest.getSwotAnalysisByCurrentUser(
+      swotAnalysisCurrentUser.get_id()
+    );
+    verify(swotAnalysisRepository, times(1))
+      .findBy_idAndOwnerId(stringArgumentCaptor.capture(), any());
+    assertEquals(
+      stringArgumentCaptor.getValue(),
+      swotAnalysisCurrentUser.get_id()
+    );
+    assertEquals(swotAnalysis, swotAnalysisCurrentUser);
+  }
+
+  @Test
+  @DisplayName("It should delete the current user swot analysis")
+  public void itShouldDeleteASwotAnalysis() {
+    SwotAnalysis swotAnalysisCurrentUser = GenerateSwotAnalysis.generateSwotAnalysis(
+      currentLoggedUser.getUserId(),
+      "1000"
+    );
+    when(WebClientUtils.getUserHeadersInfo(any()))
+      .thenReturn(currentLoggedUser);
+
+    when(swotAnalysisRepository.findBy_idAndOwnerId(anyString(), anyLong()))
+      .thenReturn(Optional.of(swotAnalysisCurrentUser));
+
+    doNothing().when(swotAnalysisRepository).delete(swotAnalysisCurrentUser);
+
+    underTest.deleteSwotAnalysisByCurrentUser(swotAnalysisCurrentUser.get_id());
+    verify(swotAnalysisRepository, times(1))
+      .findBy_idAndOwnerId(stringArgumentCaptor.capture(), any());
+    verify(swotAnalysisRepository, times(1)).delete(swotAnalysisCurrentUser);
+    assertEquals(
+      stringArgumentCaptor.getValue(),
+      swotAnalysisCurrentUser.get_id()
+    );
   }
 
   @Test
