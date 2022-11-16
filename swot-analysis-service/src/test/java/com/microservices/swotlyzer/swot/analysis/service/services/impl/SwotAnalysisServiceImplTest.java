@@ -2,6 +2,7 @@ package com.microservices.swotlyzer.swot.analysis.service.services.impl;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -35,6 +36,7 @@ import org.springframework.data.domain.Pageable;
 import com.microservices.swotlyzer.common.config.dtos.UserHeaderInfo;
 import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
 import com.microservices.swotlyzer.swot.analysis.service.dtos.CreateSwotAnalysisDTO;
+import com.microservices.swotlyzer.swot.analysis.service.dtos.UpdateSwotAnalysisDTO;
 import com.microservices.swotlyzer.swot.analysis.service.models.SwotAnalysis;
 import com.microservices.swotlyzer.swot.analysis.service.models.SwotLayoutTypes;
 import com.microservices.swotlyzer.swot.analysis.service.repositories.SwotAnalysisRepository;
@@ -223,5 +225,37 @@ public class SwotAnalysisServiceImplTest {
         newlyCreatedSwotAnalysis.getOwnerId(),
         currentLoggedUser.getUserId());
     assertEquals(newlyCreatedSwotAnalysis, mockedSwotAnalysis);
+  }
+
+  @Test
+  @DisplayName("It should update an existing swot analysis")
+  void itShouldUpdateASwotAnalysis() {
+
+    var swotDescription = "Swot Description";
+    var layoutType = SwotLayoutTypes.DEFAULT.name();
+    var swotTitle = "___________________11111111111111111__________";
+    var swotId = "TEST1";
+    UpdateSwotAnalysisDTO updateSwotAnalysisDTO = UpdateSwotAnalysisDTO.builder()
+        .swotTemplate(true)
+        .description(swotDescription)
+        .layoutType(layoutType)
+        .title(swotTitle)
+        ._id(swotId)
+        .build();
+
+    SwotAnalysis mockedSwotAnalysis = GenerateSwotAnalysis.generateSwotAnalysis(currentLoggedUser.getUserId(), swotId);
+
+    when(WebClientUtils.getUserHeadersInfo(any())).thenReturn(currentLoggedUser);
+
+    when(swotAnalysisRepository.findBy_idAndOwnerId(anyString(), anyLong()))
+        .thenReturn(Optional.of(mockedSwotAnalysis));
+
+    when(swotAnalysisRepository.save(mockedSwotAnalysis))
+        .thenReturn(mockedSwotAnalysis);
+
+    SwotAnalysis updatedSwotAnalysis = underTest.update(swotId, updateSwotAnalysisDTO);
+    verify(swotAnalysisRepository, times(1)).save(any());
+    assertEquals(updateSwotAnalysisDTO.getTitle(), updatedSwotAnalysis.getTitle());
+
   }
 }

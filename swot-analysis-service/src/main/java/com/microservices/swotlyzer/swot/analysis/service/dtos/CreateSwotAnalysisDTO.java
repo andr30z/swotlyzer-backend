@@ -7,16 +7,16 @@ import com.microservices.swotlyzer.swot.analysis.service.models.SwotLayoutTypes;
 import com.microservices.swotlyzer.swot.analysis.service.validations.ValueOfEnum;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 public class CreateSwotAnalysisDTO {
 
     @NotBlank(message = "is blank.")
