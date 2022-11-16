@@ -1,6 +1,5 @@
 package com.microservices.swotlyzer.swot.analysis.service.services.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -12,18 +11,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.microservices.swotlyzer.common.config.dtos.UserHeaderInfo;
-import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
-import com.microservices.swotlyzer.swot.Utils.GenerateSwotAnalysis;
-import com.microservices.swotlyzer.swot.analysis.service.dtos.CreateSwotAnalysisDTO;
-import com.microservices.swotlyzer.swot.analysis.service.dtos.PaginationResponse;
-import com.microservices.swotlyzer.swot.analysis.service.models.SwotAnalysis;
-import com.microservices.swotlyzer.swot.analysis.service.models.SwotLayoutTypes;
-import com.microservices.swotlyzer.swot.analysis.service.repositories.SwotAnalysisRepository;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+
 import javax.servlet.http.HttpServletRequest;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +31,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
+import com.microservices.swotlyzer.common.config.dtos.UserHeaderInfo;
+import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
+import com.microservices.swotlyzer.swot.analysis.service.dtos.CreateSwotAnalysisDTO;
+import com.microservices.swotlyzer.swot.analysis.service.models.SwotAnalysis;
+import com.microservices.swotlyzer.swot.analysis.service.models.SwotLayoutTypes;
+import com.microservices.swotlyzer.swot.analysis.service.repositories.SwotAnalysisRepository;
+import com.microservices.swotlyzer.swot.testutils.GenerateSwotAnalysis;
+
 import web.error.handling.BadRequestException;
 import web.error.handling.ResourceNotFoundException;
 
@@ -45,9 +47,8 @@ import web.error.handling.ResourceNotFoundException;
 public class SwotAnalysisServiceImplTest {
 
   private final UserHeaderInfo currentLoggedUser = new UserHeaderInfo(
-    1L,
-    "TEST_USER"
-  );
+      1L,
+      "TEST_USER");
 
   @Mock
   private SwotAnalysisRepository swotAnalysisRepository;
@@ -73,8 +74,7 @@ public class SwotAnalysisServiceImplTest {
 
     autoCloseable = MockitoAnnotations.openMocks(this);
 
-    underTest =
-      new SwotAnalysisServiceImpl(swotAnalysisRepository, httpServletRequest);
+    underTest = new SwotAnalysisServiceImpl(swotAnalysisRepository, httpServletRequest);
   }
 
   @AfterEach
@@ -87,24 +87,21 @@ public class SwotAnalysisServiceImplTest {
   @DisplayName("It should find a swot analysis of the current user")
   public void itShouldFindASwotAnalysisByTheCurrentUser() {
     SwotAnalysis swotAnalysisCurrentUser = GenerateSwotAnalysis.generateSwotAnalysis(
-      currentLoggedUser.getUserId(),
-      "1000"
-    );
+        currentLoggedUser.getUserId(),
+        "1000");
     when(WebClientUtils.getUserHeadersInfo(any()))
-      .thenReturn(currentLoggedUser);
+        .thenReturn(currentLoggedUser);
 
     when(swotAnalysisRepository.findBy_idAndOwnerId(anyString(), anyLong()))
-      .thenReturn(Optional.of(swotAnalysisCurrentUser));
+        .thenReturn(Optional.of(swotAnalysisCurrentUser));
 
     SwotAnalysis swotAnalysis = underTest.getSwotAnalysisByCurrentUser(
-      swotAnalysisCurrentUser.get_id()
-    );
+        swotAnalysisCurrentUser.get_id());
     verify(swotAnalysisRepository, times(1))
-      .findBy_idAndOwnerId(stringArgumentCaptor.capture(), any());
+        .findBy_idAndOwnerId(stringArgumentCaptor.capture(), any());
     assertEquals(
-      stringArgumentCaptor.getValue(),
-      swotAnalysisCurrentUser.get_id()
-    );
+        stringArgumentCaptor.getValue(),
+        swotAnalysisCurrentUser.get_id());
     assertEquals(swotAnalysis, swotAnalysisCurrentUser);
   }
 
@@ -132,56 +129,52 @@ public class SwotAnalysisServiceImplTest {
   @DisplayName("It should delete the current user swot analysis")
   public void itShouldDeleteASwotAnalysis() {
     SwotAnalysis swotAnalysisCurrentUser = GenerateSwotAnalysis.generateSwotAnalysis(
-      currentLoggedUser.getUserId(),
-      "1000"
-    );
+        currentLoggedUser.getUserId(),
+        "1000");
     when(WebClientUtils.getUserHeadersInfo(any()))
-      .thenReturn(currentLoggedUser);
+        .thenReturn(currentLoggedUser);
 
     when(swotAnalysisRepository.findBy_idAndOwnerId(anyString(), anyLong()))
-      .thenReturn(Optional.of(swotAnalysisCurrentUser));
+        .thenReturn(Optional.of(swotAnalysisCurrentUser));
 
     doNothing().when(swotAnalysisRepository).delete(swotAnalysisCurrentUser);
 
     underTest.deleteSwotAnalysisByCurrentUser(swotAnalysisCurrentUser.get_id());
     verify(swotAnalysisRepository, times(1))
-      .findBy_idAndOwnerId(stringArgumentCaptor.capture(), any());
+        .findBy_idAndOwnerId(stringArgumentCaptor.capture(), any());
     verify(swotAnalysisRepository, times(1)).delete(swotAnalysisCurrentUser);
     assertEquals(
-      stringArgumentCaptor.getValue(),
-      swotAnalysisCurrentUser.get_id()
-    );
+        stringArgumentCaptor.getValue(),
+        swotAnalysisCurrentUser.get_id());
   }
 
   @Test
   @DisplayName("It Should find swot analyses owned by the logged user.")
   void itShouldFindByCurrentUser() {
-    //saving in real repository
+    // saving in real repository
     SwotAnalysis swotAnalysisCurrentUser = GenerateSwotAnalysis.generateSwotAnalysis(
-      currentLoggedUser.getUserId(),
-      "1000"
-    );
+        currentLoggedUser.getUserId(),
+        "1000");
 
     when(WebClientUtils.getUserHeadersInfo(any()))
-      .thenReturn(currentLoggedUser);
+        .thenReturn(currentLoggedUser);
 
     when(swotAnalysisRepository.findByOwnerId(anyLong(), any()))
-      .thenReturn(
-        new PageImpl<SwotAnalysis>(
-          List.of(swotAnalysisCurrentUser),
-          PageRequest.of(0, 1),
-          1
-        )
-      );
+        .thenReturn(
+            new PageImpl<SwotAnalysis>(
+                List.of(swotAnalysisCurrentUser),
+                PageRequest.of(0, 1),
+                1));
 
     underTest.findByCurrentUser(1, 5);
 
     verify(swotAnalysisRepository, times(1))
-      .findByOwnerId(anyLong(), pageableArgumentCaptor.capture());
+        .findByOwnerId(anyLong(), pageableArgumentCaptor.capture());
 
     Pageable pageable = pageableArgumentCaptor.getValue();
 
-    //testing for 0 because the index for database pageable queries starts at 0 and I'm passing 1 as page (1-1 = first page)
+    // testing for 0 because the index for database pageable queries starts at 0 and
+    // I'm passing 1 as page (1-1 = first page)
     assertEquals(pageable.getPageNumber(), 0);
     assertEquals(pageable.getPageSize(), 5);
   }
@@ -206,32 +199,29 @@ public class SwotAnalysisServiceImplTest {
     var layoutType = SwotLayoutTypes.DEFAULT.name();
     var swotTitle = "Swot Title";
     var createSwotAnalysisDTO = CreateSwotAnalysisDTO
-      .builder()
-      .swotTemplate(true)
-      .description(swotDescription)
-      .layoutType(layoutType)
-      .title(swotTitle)
-      .build();
+        .builder()
+        .swotTemplate(true)
+        .description(swotDescription)
+        .layoutType(layoutType)
+        .title(swotTitle)
+        .build();
 
     SwotAnalysis mockedSwotAnalysis = GenerateSwotAnalysis.generateSwotAnalysis(
-      currentLoggedUser.getUserId(),
-      "1000"
-    );
+        currentLoggedUser.getUserId(),
+        "1000");
     when(swotAnalysisRepository.save(any())).thenReturn(mockedSwotAnalysis);
 
     when(WebClientUtils.getUserHeadersInfo(any()))
-      .thenReturn(currentLoggedUser);
+        .thenReturn(currentLoggedUser);
 
     SwotAnalysis newlyCreatedSwotAnalysis = underTest.create(
-      createSwotAnalysisDTO
-    );
+        createSwotAnalysisDTO);
 
     verify(swotAnalysisRepository, times(1)).save(any());
 
     assertEquals(
-      newlyCreatedSwotAnalysis.getOwnerId(),
-      currentLoggedUser.getUserId()
-    );
+        newlyCreatedSwotAnalysis.getOwnerId(),
+        currentLoggedUser.getUserId());
     assertEquals(newlyCreatedSwotAnalysis, mockedSwotAnalysis);
   }
 }
