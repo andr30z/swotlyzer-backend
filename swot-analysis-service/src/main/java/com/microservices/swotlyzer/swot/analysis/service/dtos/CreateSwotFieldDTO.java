@@ -4,12 +4,14 @@ import com.microservices.swotlyzer.swot.analysis.service.enums.SwotFieldType;
 import com.microservices.swotlyzer.swot.analysis.service.validations.ValueOfEnum;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
+@SuperBuilder
 public class CreateSwotFieldDTO {
     @NotNull(message = "is required")
     @NotBlank
