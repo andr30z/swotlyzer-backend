@@ -29,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -245,6 +246,10 @@ public class SwotAnalysisServiceImplTest {
 
     SwotAnalysis mockedSwotAnalysis = GenerateSwotAnalysis.generateSwotAnalysis(currentLoggedUser.getUserId(), swotId);
 
+    // copy to store old values
+    SwotAnalysis swotCopy = new SwotAnalysis();
+    BeanUtils.copyProperties(mockedSwotAnalysis, swotCopy);
+
     when(WebClientUtils.getUserHeadersInfo(any())).thenReturn(currentLoggedUser);
 
     when(swotAnalysisRepository.findBy_idAndOwnerId(anyString(), anyLong()))
@@ -256,6 +261,7 @@ public class SwotAnalysisServiceImplTest {
     SwotAnalysis updatedSwotAnalysis = underTest.update(swotId, updateSwotAnalysisDTO);
     verify(swotAnalysisRepository, times(1)).save(any());
     assertEquals(updateSwotAnalysisDTO.getTitle(), updatedSwotAnalysis.getTitle());
+    assertNotEquals(swotCopy.getTitle(), updatedSwotAnalysis.getTitle());
 
   }
 }
