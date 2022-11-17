@@ -1,19 +1,26 @@
 package com.microservices.swotlyzer.auth.service.controllers;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.microservices.swotlyzer.auth.service.dtos.CreateUserDTO;
 import com.microservices.swotlyzer.auth.service.dtos.LoginRequest;
 import com.microservices.swotlyzer.auth.service.dtos.LoginResponse;
 import com.microservices.swotlyzer.auth.service.models.User;
-import com.microservices.swotlyzer.auth.service.services.TokenProvider;
 import com.microservices.swotlyzer.auth.service.services.UserService;
 import com.microservices.swotlyzer.auth.service.utils.SecurityCipher;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/api/v1/auth-users")
@@ -29,12 +36,10 @@ public class UsersController {
         return this.usersService.create(createUserDTO);
     }
 
-    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LoginResponse> login(@CookieValue(name = "accessToken", required = false) String accessToken,
-                                               @CookieValue(name = "refreshToken", required = false)
-                                                       String refreshToken,
-                                               @RequestBody @Validated LoginRequest loginRequest) {
+            @CookieValue(name = "refreshToken", required = false) String refreshToken,
+            @RequestBody @Validated LoginRequest loginRequest) {
         String decryptedAccessToken = SecurityCipher.decrypt(accessToken, false);
         String decryptedRefreshToken = SecurityCipher.decrypt(refreshToken, false);
         return usersService.login(loginRequest, decryptedAccessToken, decryptedRefreshToken);
