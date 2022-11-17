@@ -1,5 +1,6 @@
 package com.microservices.swotlyzer.swot.analysis.service.utils;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
@@ -7,11 +8,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import com.microservices.swotlyzer.swot.analysis.service.dtos.PaginationResponse;
 import com.microservices.swotlyzer.swot.analysis.service.models.SwotAnalysis;
 import com.microservices.swotlyzer.swot.analysis.service.repositories.SwotAnalysisRepository;
