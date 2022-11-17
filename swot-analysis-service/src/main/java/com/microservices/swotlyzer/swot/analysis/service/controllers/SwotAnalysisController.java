@@ -19,29 +19,26 @@ public class SwotAnalysisController {
 
   @GetMapping("/me")
   public PaginationResponse<SwotAnalysis> getMySwotAnalyses(
-    @RequestParam(name = "page", defaultValue = "1") int page,
-    @RequestParam(name = "perPage", defaultValue = "15") int perPage
-  ) {
+      @RequestParam(name = "page", defaultValue = "1") int page,
+      @RequestParam(name = "perPage", defaultValue = "15") int perPage) {
     return this.swotAnalysisService.findByCurrentUser(page, perPage);
   }
 
-  @GetMapping("/me/{id}")
+  @GetMapping("/{id}/me")
   public SwotAnalysis getMySwotAnalysis(@PathVariable String swotId) {
     return this.swotAnalysisService.getSwotAnalysisByCurrentUser(swotId);
   }
 
   @PostMapping
   public SwotAnalysis create(
-    @Validated @RequestBody CreateSwotAnalysisDTO createSWOTAnalysisDTO
-  ) {
+      @Validated @RequestBody CreateSwotAnalysisDTO createSWOTAnalysisDTO) {
     return this.swotAnalysisService.create(createSWOTAnalysisDTO);
   }
 
   @PutMapping("/{id}")
   public SwotAnalysis update(
-    @PathVariable String id,
-    @Validated @RequestBody UpdateSwotAnalysisDTO updateSWOTAnalysisDTO
-  ) {
+      @PathVariable String id,
+      @Validated @RequestBody UpdateSwotAnalysisDTO updateSWOTAnalysisDTO) {
     return this.swotAnalysisService.update(id, updateSWOTAnalysisDTO);
   }
 
