@@ -1,13 +1,11 @@
 package com.microservices.swotlyzer.auth.service.repositories;
 
-import com.microservices.swotlyzer.auth.service.models.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.mock.web.MockHttpServletRequest;
+
+import com.microservices.swotlyzer.auth.service.models.User;
 
 @DataJpaTest
 class UserRepositoryTest {

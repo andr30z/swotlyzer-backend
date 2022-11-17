@@ -1,22 +1,18 @@
 package web.error.handling;
 
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 public class BaseApiExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -37,6 +33,7 @@ public class BaseApiExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(HttpStatus.CONFLICT, exception.getMessage(),
                 Collections.singletonList(exception.getMessage()));
     }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Object> handleBadRequestException(BadRequestException exception) {
         return buildResponseEntity(HttpStatus.BAD_REQUEST, exception.getMessage(),
@@ -45,8 +42,8 @@ public class BaseApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-                                                                  HttpHeaders headers, HttpStatus status,
-                                                                  WebRequest request) {
+            HttpHeaders headers, HttpStatus status,
+            WebRequest request) {
         List<String> errors = new ArrayList<>();
         ex.getBindingResult().getFieldErrors().forEach(fieldError -> {
             errors.add("Field " + fieldError.getField() + " " + fieldError.getDefaultMessage());
@@ -55,14 +52,13 @@ public class BaseApiExceptionHandler extends ResponseEntityExceptionHandler {
             errors.add("Field " + objectError.getObjectName() + " " + objectError.getDefaultMessage());
         });
 
-
         return buildResponseEntity(HttpStatus.BAD_REQUEST, "Informed argument(s) validation error(s)", errors);
     }
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
-                                                                  HttpHeaders headers, HttpStatus status,
-                                                                  WebRequest request) {
+            HttpHeaders headers, HttpStatus status,
+            WebRequest request) {
         return buildResponseEntity(HttpStatus.BAD_REQUEST, "Malformed JSON body and/or field error",
                 Collections.singletonList(ex.getMessage()));
     }

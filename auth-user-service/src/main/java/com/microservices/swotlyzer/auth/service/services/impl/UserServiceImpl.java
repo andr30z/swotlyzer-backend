@@ -1,39 +1,37 @@
 package com.microservices.swotlyzer.auth.service.services.impl;
 
+import java.security.SecureRandom;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.microservices.swotlyzer.auth.service.dtos.CreateUserDTO;
 import com.microservices.swotlyzer.auth.service.dtos.LoginRequest;
 import com.microservices.swotlyzer.auth.service.dtos.LoginResponse;
-import com.microservices.swotlyzer.auth.service.producers.MailProducer;
-import com.microservices.swotlyzer.common.config.dtos.UserCreatedEvent;
 import com.microservices.swotlyzer.auth.service.models.Token;
 import com.microservices.swotlyzer.auth.service.models.User;
+import com.microservices.swotlyzer.auth.service.producers.MailProducer;
 import com.microservices.swotlyzer.auth.service.repositories.UserRepository;
 import com.microservices.swotlyzer.auth.service.services.TokenProvider;
 import com.microservices.swotlyzer.auth.service.services.UserService;
 import com.microservices.swotlyzer.auth.service.utils.CookieUtil;
-import com.microservices.swotlyzer.common.config.dtos.EmailDTO;
+import com.microservices.swotlyzer.common.config.dtos.UserCreatedEvent;
 import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+
 import web.error.handling.BadRequestException;
 import web.error.handling.EntityExistsException;
 import web.error.handling.ResourceNotFoundException;
 
-import javax.servlet.http.HttpServletRequest;
-import java.security.SecureRandom;
-import java.util.Optional;
-
 @Service
-@ComponentScan(basePackages = {"com.microservices.swotlyzer"})
+@ComponentScan(basePackages = { "com.microservices.swotlyzer" })
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
@@ -44,8 +42,8 @@ public class UserServiceImpl implements UserService {
     private final MailProducer mailProducer;
 
     public UserServiceImpl(UserRepository userRepository, TokenProvider tokenProvider, CookieUtil cookieUtil,
-                           HttpServletRequest httpServletRequest,
-                           PasswordEncoder passwordEncoder, MailProducer mailProducer) {
+            HttpServletRequest httpServletRequest,
+            PasswordEncoder passwordEncoder, MailProducer mailProducer) {
         this.userRepository = userRepository;
         this.tokenProvider = tokenProvider;
         this.httpServletRequest = httpServletRequest;
@@ -56,7 +54,6 @@ public class UserServiceImpl implements UserService {
 
     private void sendCreatedUserMail(User user) {
         mailProducer.sendMessage(new UserCreatedEvent(user.getId(), user.getName(), user.getEmail()));
-
 
     }
 
@@ -115,8 +112,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<LoginResponse> refresh(String accessToken, String refreshToken) {
         var refreshTokenValid = tokenProvider.validateToken(refreshToken);
-        if (!refreshTokenValid) throw new BadRequestException("Refresh Token is invalid!");
-
+        if (!refreshTokenValid)
+            throw new BadRequestException("Refresh Token is invalid!");
 
         String currentUserEmail = tokenProvider.getUsernameFromToken(refreshToken);
         Token newAccessToken = tokenProvider.generateAccessToken(currentUserEmail);
@@ -133,7 +130,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getTokenUser(String token) {
         boolean isTokenValid = this.tokenProvider.validateToken(token);
-        if (!isTokenValid) throw new BadRequestException("Token invalid!");
+        if (!isTokenValid)
+            throw new BadRequestException("Token invalid!");
         var tokenUsername = this.tokenProvider.getUsernameFromToken(token);
         return this.userRepository.findUserByEmail(tokenUsername)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found!"));
