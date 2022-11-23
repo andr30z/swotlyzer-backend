@@ -1,5 +1,7 @@
 package com.microservices.swotlyzer.auth.service.services.impl;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Optional;
 
@@ -23,6 +25,7 @@ import com.microservices.swotlyzer.auth.service.repositories.UserRepository;
 import com.microservices.swotlyzer.auth.service.services.TokenProvider;
 import com.microservices.swotlyzer.auth.service.services.UserService;
 import com.microservices.swotlyzer.auth.service.utils.CookieUtil;
+import com.microservices.swotlyzer.auth.service.utils.SecurityCipher;
 import com.microservices.swotlyzer.common.config.dtos.UserCreatedEvent;
 import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
 
@@ -73,7 +76,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<LoginResponse> login(LoginRequest loginRequest, String accessToken, String refreshToken) {
+    public ResponseEntity<LoginResponse> login(LoginRequest loginRequest, String encryptedAccessToken,
+            String encryptedRefreshToken) {
+        String accessToken = SecurityCipher.decrypt(encryptedAccessToken, false);
+        String refreshToken = SecurityCipher.decrypt(encryptedRefreshToken, false);
         String email = loginRequest.getEmail();
         User user = this.findByEmail(email);
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword()))
@@ -110,7 +116,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<LoginResponse> refresh(String accessToken, String refreshToken) {
+    public ResponseEntity<LoginResponse> refresh(String encryptedAccessToken,
+            String encryptedRefreshToken) {
+        String refreshToken = SecurityCipher.decrypt(encryptedRefreshToken, false);
         var refreshTokenValid = tokenProvider.validateToken(refreshToken);
         if (!refreshTokenValid)
             throw new BadRequestException("Refresh Token is invalid!");
@@ -128,7 +136,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getTokenUser(String token) {
+    public User getTokenUser(String encryptedToken) {
+        String token = SecurityCipher.decrypt(URLDecoder.decode(encryptedToken, StandardCharsets.UTF_8), true);
+
         boolean isTokenValid = this.tokenProvider.validateToken(token);
         if (!isTokenValid)
             throw new BadRequestException("Token invalid!");

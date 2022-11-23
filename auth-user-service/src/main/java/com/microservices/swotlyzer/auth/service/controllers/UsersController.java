@@ -1,8 +1,5 @@
 package com.microservices.swotlyzer.auth.service.controllers;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +17,6 @@ import com.microservices.swotlyzer.auth.service.dtos.LoginRequest;
 import com.microservices.swotlyzer.auth.service.dtos.LoginResponse;
 import com.microservices.swotlyzer.auth.service.models.User;
 import com.microservices.swotlyzer.auth.service.services.UserService;
-import com.microservices.swotlyzer.auth.service.utils.SecurityCipher;
 
 @RestController
 @RequestMapping("/api/v1/auth-users")
@@ -40,18 +36,15 @@ public class UsersController {
     public ResponseEntity<LoginResponse> login(@CookieValue(name = "accessToken", required = false) String accessToken,
             @CookieValue(name = "refreshToken", required = false) String refreshToken,
             @RequestBody @Validated LoginRequest loginRequest) {
-        String decryptedAccessToken = SecurityCipher.decrypt(accessToken, false);
-        String decryptedRefreshToken = SecurityCipher.decrypt(refreshToken, false);
-        return usersService.login(loginRequest, decryptedAccessToken, decryptedRefreshToken);
+
+        return usersService.login(loginRequest, accessToken, refreshToken);
     }
 
     @PostMapping(value = "/refresh", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LoginResponse> refreshToken(
             @CookieValue(name = "accessToken", required = false) String accessToken,
             @CookieValue(name = "refreshToken", required = false) String refreshToken) {
-        String decryptedAccessToken = SecurityCipher.decrypt(accessToken, false);
-        String decryptedRefreshToken = SecurityCipher.decrypt(refreshToken, false);
-        return usersService.refresh(decryptedAccessToken, decryptedRefreshToken);
+        return usersService.refresh(accessToken, refreshToken);
     }
 
     @GetMapping("/me")
@@ -66,8 +59,7 @@ public class UsersController {
 
     @GetMapping("/validate-token")
     public User validateToken(@RequestParam String token) {
-        String decryptedAccessToken = SecurityCipher.decrypt(URLDecoder.decode(token, StandardCharsets.UTF_8), true);
-        return this.usersService.getTokenUser(decryptedAccessToken);
+        return this.usersService.getTokenUser(token);
     }
 
 }
