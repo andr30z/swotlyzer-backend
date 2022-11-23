@@ -1,8 +1,5 @@
 package com.microservices.swotlyzer.auth.service.controllers;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +17,6 @@ import com.microservices.swotlyzer.auth.service.dtos.LoginRequest;
 import com.microservices.swotlyzer.auth.service.dtos.LoginResponse;
 import com.microservices.swotlyzer.auth.service.models.User;
 import com.microservices.swotlyzer.auth.service.services.UserService;
-import com.microservices.swotlyzer.auth.service.utils.SecurityCipher;
 
 @RestController
 @RequestMapping("/api/v1/auth-users")
