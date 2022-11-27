@@ -35,14 +35,14 @@ public class SwotAnalysisController {
     return this.swotAnalysisService.create(createSWOTAnalysisDTO);
   }
 
-  @PutMapping("/{id}")
+  @PutMapping("/{id}/me")
   public SwotAnalysis update(
       @PathVariable String id,
       @Validated @RequestBody UpdateSwotAnalysisDTO updateSWOTAnalysisDTO) {
     return this.swotAnalysisService.update(id, updateSWOTAnalysisDTO);
   }
 
-  @DeleteMapping("/{id}")
+  @DeleteMapping("/{id}/me")
   public SuccessDeleteSwotAnalysisDTO deleteById(@PathVariable String id) {
     return this.swotAnalysisService.deleteSwotAnalysisByCurrentUser(id);
   }
