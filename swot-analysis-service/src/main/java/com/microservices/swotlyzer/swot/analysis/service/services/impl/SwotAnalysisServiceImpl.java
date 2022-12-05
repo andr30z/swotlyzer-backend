@@ -12,7 +12,7 @@ import com.microservices.swotlyzer.swot.analysis.service.repositories.SwotAnalys
 import com.microservices.swotlyzer.swot.analysis.service.services.SwotAnalysisService;
 import com.microservices.swotlyzer.swot.analysis.service.utils.PaginationUtil;
 import java.util.Collections;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

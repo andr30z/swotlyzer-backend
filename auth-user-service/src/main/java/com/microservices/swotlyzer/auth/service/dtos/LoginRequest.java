@@ -2,8 +2,8 @@ package com.microservices.swotlyzer.auth.service.dtos;
 
 import lombok.*;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 
 
 @Getter
