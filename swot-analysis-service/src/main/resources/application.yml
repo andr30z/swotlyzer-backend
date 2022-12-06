@@ -1,6 +1,12 @@
 .env:
   prefix: ""
 
+management:
+  endpoints:
+    jmx:
+      exposure:
+        include: "*"
+
 eureka:
   instance:
     prefer-ip-address: true
@@ -41,6 +47,6 @@ spring:
 server:
   port: 0
 
-springdoc:
-  swagger-ui:
-    path: /swot/api-docs/swagger-ui.html
+# springdoc:
+#   swagger-ui:
+#     path: /swot/api-docs/swagger-ui.html

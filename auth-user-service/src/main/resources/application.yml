@@ -2,7 +2,11 @@
   prefix: ""
 
 mail-sender-url: http://mail-sender-service/api/v1/email/send
-
+management:
+  endpoints:
+    jmx:
+      exposure:
+        include: "*"
 server:
   port: 0
 authentication:
@@ -31,10 +35,19 @@ spring:
   kafka:
     topic:
       name: mail-sender-topic
+    consumer:
+      properties:
+        request:
+          timeout:
+            ms: 15000
     producer:
       bootstrap-servers: localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        request:
+          timeout:
+            ms: 15000
   application:
     name: auth-user-service
   datasource:

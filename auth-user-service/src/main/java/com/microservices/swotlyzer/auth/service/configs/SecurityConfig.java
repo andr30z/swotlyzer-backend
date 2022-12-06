@@ -29,7 +29,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // We don't need CSRF for this example
         http.csrf().disable()
-                .authorizeRequests().anyRequest().permitAll();
+                .authorizeHttpRequests().anyRequest().permitAll();
         return http.build();
     }
 
