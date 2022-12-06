@@ -18,6 +18,7 @@ import org.springframework.web.server.ServerWebExchange;
 import com.microservices.swotlyzer.common.config.models.BaseUser;
 import com.microservices.swotlyzer.common.config.utils.WebClientUtils;
 
+import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

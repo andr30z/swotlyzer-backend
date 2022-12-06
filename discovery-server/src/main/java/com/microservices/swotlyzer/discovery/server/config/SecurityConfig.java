@@ -25,7 +25,7 @@ public class SecurityConfig {
     public InMemoryUserDetailsManager userDetailsService() {
         UserDetails user = User.builder()
                 .username(USERNAME)
-                .password("{noop}"+PASSWORD)
+                .password("{noop}" + PASSWORD)
                 .roles("USER")
                 .build();
         return new InMemoryUserDetailsManager(user);
@@ -35,7 +35,6 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.csrf().disable();
-
 
         return http.build();
     }
