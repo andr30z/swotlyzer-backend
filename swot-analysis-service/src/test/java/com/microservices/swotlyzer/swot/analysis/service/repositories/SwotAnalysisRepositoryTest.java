@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,12 @@ public class SwotAnalysisRepositoryTest {
 
     @Autowired
     private SwotAnalysisRepository swotAnalysisRepository;
+
+
+    @AfterEach
+    void close(){
+        swotAnalysisRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("It should Find swot analyses made by an specific owner")

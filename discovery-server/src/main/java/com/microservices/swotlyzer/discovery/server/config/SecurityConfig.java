@@ -23,6 +23,7 @@ public class SecurityConfig {
 
     @Bean
     public InMemoryUserDetailsManager userDetailsService() {
+        System.out.println(USERNAME);
         UserDetails user = User.builder()
                 .username(USERNAME)
                 .password("{noop}" + PASSWORD)
