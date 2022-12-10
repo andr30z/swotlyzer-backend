@@ -18,7 +18,7 @@ import web.error.handling.BadRequestException;
 import web.error.handling.OperationNotAllowedException;
 import web.error.handling.ResourceNotFoundException;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.Objects;
 

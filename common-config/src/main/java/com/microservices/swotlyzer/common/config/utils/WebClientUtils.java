@@ -2,7 +2,7 @@ package com.microservices.swotlyzer.common.config.utils;
 
 import java.util.function.Consumer;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpHeaders;
 

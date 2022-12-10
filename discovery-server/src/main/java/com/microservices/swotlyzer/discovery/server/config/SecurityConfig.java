@@ -23,9 +23,10 @@ public class SecurityConfig {
 
     @Bean
     public InMemoryUserDetailsManager userDetailsService() {
+        System.out.println(USERNAME);
         UserDetails user = User.builder()
                 .username(USERNAME)
-                .password("{noop}"+PASSWORD)
+                .password("{noop}" + PASSWORD)
                 .roles("USER")
                 .build();
         return new InMemoryUserDetailsManager(user);
@@ -36,12 +37,11 @@ public class SecurityConfig {
 
         http.csrf().disable();
 
-
         return http.build();
     }
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers("/images/**", "/js/**", "/webjars/**");
+        return (web) -> web.ignoring().requestMatchers("/images/**", "/js/**", "/webjars/**");
     }
 }

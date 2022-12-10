@@ -12,10 +12,28 @@
         <module>auth-user-service</module>
         <module>web-error-handling</module>
     </modules>
+    <repositories>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>netflix-candidates</id>
+            <name>Netflix Candidates</name>
+            <url>https://artifactory-oss.prod.netflix.net/artifactory/maven-oss-candidates</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.0</version>
+        <version>3.0.0</version>
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.api</groupId>
@@ -24,23 +42,24 @@
     <name>swotlyzer</name>
     <description>swotlyzer</description>
     <properties>
-        <java.version>11</java.version>
-        <spring-boot.version>2.7.0</spring-boot.version>
+        <java.version>17</java.version>
+        <spring-boot.version>3.0.0</spring-boot.version>
         <spring-fox-swagger2.version>2.9.2</spring-fox-swagger2.version>
         <spring-fox-swagger-ui.version>2.9.2</spring-fox-swagger-ui.version>
-        <jsonwebtoken.version>0.9.1</jsonwebtoken.version>
+        <jsonwebtoken.version>0.11.5</jsonwebtoken.version>
         <jaxb-api.version>2.3.0</jaxb-api.version>
         <lombok.version>1.18.24</lombok.version>
         <spring-dotenv.version>2.5.4</spring-dotenv.version>
-        <spring-cloud.version>2021.0.2</spring-cloud.version>
-        <eureka.version>3.1.3</eureka.version>
-        <spring-cloud-gateway.version>3.1.3</spring-cloud-gateway.version>
-        <h2.version>1.4.200</h2.version>
+        <spring-cloud.version>2022.0.0-RC3</spring-cloud.version>
+        <eureka.version>4.0.0-RC3</eureka.version>
+        <cloud-config.version>4.0.0-RC3</cloud-config.version>
+        <spring-cloud-gateway.version>4.0.0-RC3</spring-cloud-gateway.version>
+        <h2.version>2.1.214</h2.version>
         <mock-server.version>4.0.1</mock-server.version>
         <ok-http.version>4.0.1</ok-http.version>
         <mockito-inline.version>4.7.0</mockito-inline.version>
-        <spring-kafka.version>2.9.0</spring-kafka.version>
-        <flyway.version>8.1.0</flyway.version>
+        <spring-kafka.version>3.0.0</spring-kafka.version>
+        <flyway.version>9.8.3</flyway.version>
         <spring-cloud-sleuth.version>3.1.5</spring-cloud-sleuth.version>
     </properties>
     <dependencyManagement>
@@ -50,11 +69,11 @@
                 <artifactId>spring-dotenv</artifactId>
                 <version>${spring-dotenv.version}</version>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
+            <!-- https://mvnrepository.com/artifact/jakarta.servlet/jakarta.servlet-api -->
             <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>4.0.1</version>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>6.0.0</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -93,6 +112,21 @@
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring-cloud.version}</version>
             </dependency>
+            <!-- <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>2.3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${jaxb-api.version}</version>
+            </dependency> -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-commons</artifactId>
+                <version>${cloud-config.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
@@ -107,6 +141,12 @@
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
                 <version>${eureka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-properties-migrator</artifactId>
+                <version>${spring-boot.version}</version>
+                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -127,6 +167,11 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-devtools</artifactId>
                 <optional>true</optional>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
                 <version>${spring-boot.version}</version>
             </dependency>
             <dependency>
@@ -185,9 +230,20 @@
                 <version>${spring-fox-swagger-ui.version}</version>
             </dependency>
             <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt -->
+            <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api -->
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt</artifactId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jsonwebtoken.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jsonwebtoken.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-gson</artifactId>
                 <version>${jsonwebtoken.version}</version>
             </dependency>
             <dependency>
@@ -195,12 +251,6 @@
                 <artifactId>flyway-core</artifactId>
                 <version>${flyway.version}</version>
             </dependency>
-
-            <!--            <dependency>-->
-            <!--                <groupId>javax.xml.bind</groupId>-->
-            <!--                <artifactId>jaxb-api</artifactId>-->
-            <!--                <version>${jaxb-api.version}</version>-->
-            <!--            </dependency>-->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-jpa</artifactId>

@@ -27,7 +27,7 @@ import web.error.handling.BadRequestException;
 import web.error.handling.EntityExistsException;
 import web.error.handling.ResourceNotFoundException;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Optional;
 

@@ -3,16 +3,19 @@ package com.microservices.swotlyzer.swot.analysis.service.utils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.microservices.swotlyzer.swot.analysis.service.dtos.PaginationResponse;
-import com.microservices.swotlyzer.swot.analysis.service.models.SwotAnalysis;
-import com.microservices.swotlyzer.swot.analysis.service.repositories.SwotAnalysisRepository;
-import com.microservices.swotlyzer.swot.testutils.GenerateSwotAnalysis;
 import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+
+import com.microservices.swotlyzer.swot.analysis.service.dtos.PaginationResponse;
+import com.microservices.swotlyzer.swot.analysis.service.models.SwotAnalysis;
+import com.microservices.swotlyzer.swot.analysis.service.repositories.SwotAnalysisRepository;
+import com.microservices.swotlyzer.swot.testutils.GenerateSwotAnalysis;
 
 @DataMongoTest
 public class PaginationUtilTest {
@@ -21,6 +24,11 @@ public class PaginationUtilTest {
   private SwotAnalysisRepository swotAnalysisRepository;
 
   private static PaginationUtil<SwotAnalysis, SwotAnalysisRepository> underTest = new PaginationUtil<SwotAnalysis, SwotAnalysisRepository>();
+
+  @AfterEach
+  void close() {
+    swotAnalysisRepository.deleteAll();
+  }
 
   @Test
   void itShouldBuildAPaginationResponse() {

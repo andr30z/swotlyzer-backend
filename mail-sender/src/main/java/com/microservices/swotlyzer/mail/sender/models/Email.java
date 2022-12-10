@@ -3,7 +3,7 @@ package com.microservices.swotlyzer.mail.sender.models;
 import com.microservices.swotlyzer.mail.sender.enums.MailStatus;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor

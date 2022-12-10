@@ -1,6 +1,12 @@
 .env:
   prefix: ""
 
+management:
+  endpoints:
+    jmx:
+      exposure:
+        include: "*"
+
 eureka:
   instance:
     prefer-ip-address: true
@@ -17,6 +23,9 @@ authentication:
     refreshTokenCookieName: refreshToken
 
 spring:
+  cloud: 
+    compatibility-verifier:
+      enabled: false
   zipkin:
     base-url: http://localhost:9411
   sleuth:
@@ -41,6 +50,6 @@ spring:
 server:
   port: 0
 
-springdoc:
-  swagger-ui:
-    path: /swot/api-docs/swagger-ui.html
+# springdoc:
+#   swagger-ui:
+#     path: /swot/api-docs/swagger-ui.html

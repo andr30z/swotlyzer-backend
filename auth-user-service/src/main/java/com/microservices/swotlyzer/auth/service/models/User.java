@@ -1,7 +1,7 @@
 package com.microservices.swotlyzer.auth.service.models;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 import com.microservices.swotlyzer.common.config.models.BaseUser;
 
