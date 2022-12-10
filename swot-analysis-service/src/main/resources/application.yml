@@ -23,6 +23,9 @@ authentication:
     refreshTokenCookieName: refreshToken
 
 spring:
+  cloud: 
+    compatibility-verifier:
+      enabled: false
   zipkin:
     base-url: http://localhost:9411
   sleuth:

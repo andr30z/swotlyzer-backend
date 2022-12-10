@@ -1,6 +1,7 @@
 .env:
   prefix: ""
 
+# spring.cloud.compatibility-verifier.enabled=false
 mail-sender-url: http://mail-sender-service/api/v1/email/send
 management:
   endpoints:
@@ -11,8 +12,8 @@ server:
   port: 0
 authentication:
   auth:
-    tokenSecret: ${TOKEN_SECRET}
     tokenExpirationMsec: ${TOKEN_EXPIRATION_MSEC}
+    tokenSecret: ${TOKEN_SECRET}
     refreshTokenExpirationMsec: ${REFRESH_TOKEN_EXPIRATION_MSEC}
     accessTokenCookieName: accessToken
     refreshTokenCookieName: refreshToken
@@ -22,6 +23,9 @@ eureka:
       defautlZone: http://eureka:password@localhost:8761/eureka
 
 spring:
+  cloud: 
+    compatibility-verifier:
+      enabled: false
   zipkin:
     base-url: http://localhost:9411
   sleuth: 

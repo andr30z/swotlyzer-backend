@@ -30,6 +30,7 @@ public class SecurityConfig {
         // We don't need CSRF for this example
         http.csrf().disable()
                 .authorizeHttpRequests().anyRequest().permitAll();
+                
         return http.build();
     }
 
