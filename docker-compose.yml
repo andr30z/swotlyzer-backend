@@ -23,35 +23,43 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
-  postgresql-db:
+  postgresql-auth-user-service:
     image: postgres
-    container_name: postgres-container
+    container_name:  postgresql-auth-user-service
     restart: always
     environment:
       POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: swotlyzer-auth-service
     ports:
       - "5432:5432"
 
-  mongo:
+  postgresql-mail-sender-service:
+    image: postgres
+    container_name:  postgresql-mail-sender-service
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: swotlyzer-mail-sender
+      PGPORT: 5431
+      POSTGRES_PORT: 5431
+    ports:
+      - "5431:5431"
+
+  mongodb-swot-analysis-service:
     image: mongo
     restart: always
+    container_name:  mongodb-swot-analysis-service
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: mongo
-
-  mongo-express:
-    image: mongo-express
-    restart: always
     ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:mongo@mongo:27017/
+      - "3000:3000"
 
   api-gateway:
     build: "./api-gateway"
-    container_name: api-gateway-container
+    container_name: api-gateway
     restart: always
     depends_on:
       - discovery-server
@@ -72,21 +80,21 @@ services:
     container_name: mail-sender-container
     restart: always
     depends_on:
+      - postgresql-mail-sender-service
       - discovery-server
-      - postgresql-db
       - api-gateway
     env_file:
       - ./mail-sender/src/main/resources/.env
     ports:
       - "8082"
 
-  swot-analysis:
+  swot-analysis-service:
     build: "./swot-analysis-service"
-    container_name: swot-analysis-service-container
+    container_name: swot-analysis-service
     restart: always
     depends_on:
       - discovery-server
-      - mongo
+      - mongodb-swot-analysis-service
       - api-gateway
     env_file:
       - ./swot-analysis-service/src/main/resources/.env
@@ -95,13 +103,13 @@ services:
 
   auth-user-service:
     build: "./auth-user-service"
-    container_name: auth-user-service-container
+    container_name: auth-user-service
     restart: always
     depends_on:
+      - postgresql-auth-user-service
       - discovery-server
-      - postgresql-db
       - api-gateway
     env_file:
       - ./auth-user-service/src/main/resources/.env
     ports:
-      - "8083"
+      - "8081"

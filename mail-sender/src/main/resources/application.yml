@@ -5,11 +5,16 @@ server:
   port: 0
 
 eureka:
+  instance:
+    prefer-ip-address: true
   client:
     service-url:
-      defautlZone: http://eureka:password@discovery-server:8761/eureka
+      defaultZone: http://eureka:password@discovery-server:8761/eureka
 
 spring:
+  cloud: 
+    compatibility-verifier:
+      enabled: false
   zipkin:
     base-url: http://localhost:9411
   sleuth:
