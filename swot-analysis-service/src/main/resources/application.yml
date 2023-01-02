@@ -9,10 +9,10 @@ management:
 
 eureka:
   instance:
-    prefer-ip-address: true
+    prefer-ip-address: ${EUREKA_PREFER_IP_ADDRESS}
   client:
     service-url:
-      defaultZone: http://eureka:password@discovery-server:8761/eureka
+      defaultZone: ${EUREKA_DEFAULTZONE}
 
 authentication:
   auth:
@@ -45,7 +45,7 @@ spring:
 
   jackson:
     serialization:
-      write_dates_as_timestamps: false
+      write-dates-as-timestamps: false
 server:
   port: 0
 
