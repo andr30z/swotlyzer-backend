@@ -49,11 +49,6 @@ spring:
   kafka:
     topic:
       name: mail-sender-topic
-    consumer:
-      properties:
-        request:
-          timeout:
-            ms: 15000
     producer:
       bootstrap-servers: ${BROKER_URL}
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
