@@ -46,7 +46,7 @@ spring:
     topic:
       name: mail-sender-topic
     consumer:
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: ${BROKER_URL}
       group-id: mail-sender
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
