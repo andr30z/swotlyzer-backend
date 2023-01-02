@@ -14,6 +14,7 @@ api-core/src/main/resources/.env
 .sts4-cache
 .env
 **/.env
+**/docker.env
 ### IntelliJ IDEA ###
 .idea
 *.iws
