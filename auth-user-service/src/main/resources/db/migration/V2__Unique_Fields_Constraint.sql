@@ -1,1 +1,1 @@
-ALTER TABLE users ADD CONSTRAINT unique_phone_email_users  UNIQUE (email, phone);
+ALTER TABLE "users" ADD CONSTRAINT unique_phone_email_users  UNIQUE (email, phone);

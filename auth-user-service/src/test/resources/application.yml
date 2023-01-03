@@ -18,16 +18,19 @@ eureka:
       defautlZone: http://eureka:password@localhost:8761/eureka
 
 spring:
+  flyway:
+    enabled: false
   application:
     name: auth-user-service
   datasource:
-    url: ${AUTH_SERVICE_POSTGRESQL_CONNECTION}
-    username: ${AUTH_SERVICE_POSTGRESQL_USERNAME}
-    password: ${AUTH_SERVICE_POSTGRESQL_PASSWORD}
+    url: jdbc:h2:mem:test_db;MODE=PostgreSQL
+    # username: sa
+    # password: ${AUTH_SERVICE_POSTGRESQL_PASSWORD}
     driver-class-name: org.h2.Driver
   jpa:
     hibernate:
       ddl-auto: create-drop
+
 
 
 

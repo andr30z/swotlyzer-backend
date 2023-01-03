@@ -33,6 +33,7 @@ spring:
     url: ${AUTH_SERVICE_POSTGRESQL_CONNECTION}
     username: ${AUTH_SERVICE_POSTGRESQL_USERNAME}
     password: ${AUTH_SERVICE_POSTGRESQL_PASSWORD}
+    
   cloud:
     compatibility-verifier:
       enabled: false

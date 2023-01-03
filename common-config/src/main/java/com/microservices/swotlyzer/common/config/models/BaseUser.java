@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.SequenceGenerator;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,7 +19,9 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 public class BaseUser {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "users_seq")
+    @SequenceGenerator(name = "users_seq", sequenceName = "users_seq", allocationSize = 1)
+    @Column(name = "id", updatable = false)
     private Long id;
     @Column(unique = true)
     private String email;
