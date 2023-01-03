@@ -15,7 +15,9 @@ import java.time.LocalDateTime;
 @Table(name = "emails")
 public class Email {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "emails_seq")
+    @SequenceGenerator(name = "emails_seq", sequenceName = "emails_seq", allocationSize = 1)
+    @Column(name = "id", updatable = false)
     private Long id;
     private String ownerRef;
     private String emailFrom;

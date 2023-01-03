@@ -5,6 +5,9 @@ import com.microservices.swotlyzer.mail.sender.enums.MailStatus;
 import com.microservices.swotlyzer.mail.sender.models.Email;
 import com.microservices.swotlyzer.mail.sender.repositories.EmailRepository;
 import com.microservices.swotlyzer.mail.sender.services.EmailService;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
@@ -39,6 +43,7 @@ public class EmailServiceImpl implements EmailService {
             email.setMailStatus(MailStatus.SENT);
         } catch (MailException mailException) {
             email.setMailStatus(MailStatus.ERROR);
+            log.error("Failed to send email", mailException);
         }
         return this.emailRepository.save(email);
     }

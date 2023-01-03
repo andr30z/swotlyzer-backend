@@ -54,8 +54,9 @@ services:
     restart: always
     container_name: mongodb-swot-analysis-service
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: mongo
+      MONGO_INITDB_DATABASE: swotlyzer
+      # MONGO_INITDB_ROOT_USERNAME: root
+      # MONGO_INITDB_ROOT_PASSWORD: mongo
     ports:
       - "3000:3000"
 

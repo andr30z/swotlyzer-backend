@@ -57,4 +57,4 @@ spring:
       properties:
         request:
           timeout:
-            ms: 15000
+            ms: 10000
