@@ -25,7 +25,7 @@ public class SwotAnalysisController {
   }
 
   @GetMapping("/{id}/me")
-  public SwotAnalysis getMySwotAnalysis(@PathVariable String swotId) {
+  public SwotAnalysis getMySwotAnalysis(@PathVariable(required = true, name = "id") String swotId) {
     return this.swotAnalysisService.getSwotAnalysisByCurrentUser(swotId);
   }
 

@@ -2,10 +2,14 @@ CREATE SEQUENCE IF NOT EXISTS hibernate_sequence START WITH 1 INCREMENT BY 1;
 
 CREATE TABLE users
 (
-    id       BIGINT NOT NULL,
-    email    VARCHAR(255),
-    name     VARCHAR(255),
-    phone    VARCHAR(255),
+    id bigint NOT NULL,
+    email VARCHAR(255),
+    name VARCHAR(255),
+    phone VARCHAR(255),
     password VARCHAR(255),
-    CONSTRAINT pk_users PRIMARY KEY (id)
+    CONSTRAINT users_pkey PRIMARY KEY (id)
 );
+
+
+CREATE SEQUENCE IF NOT EXISTS users_seq INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1;
+

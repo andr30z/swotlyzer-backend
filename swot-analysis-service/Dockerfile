@@ -1,5 +1,5 @@
-FROM openjdk:11.0.9-jdk-slim
+FROM openjdk:17-alpine
 VOLUME /tmp
-ARG JAR_FILE=/target/api-core-0.0.1-SNAPSHOT.jar
-COPY ${JAR_FILE} api-core.jar
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/api-core.jar"]
+ARG JAR_FILE=/target/swot-analysis-service-0.0.1-SNAPSHOT.jar
+COPY ${JAR_FILE} swot-analysis-service.jar
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/swot-analysis-service.jar"]

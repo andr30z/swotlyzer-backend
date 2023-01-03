@@ -5,11 +5,16 @@ server:
   port: 0
 
 eureka:
+  instance:
+    prefer-ip-address: ${EUREKA_PREFER_IP_ADDRESS}
   client:
     service-url:
-      defautlZone: http://eureka:password@localhost:8761/eureka
+      defaultZone: ${EUREKA_DEFAULTZONE}
 
 spring:
+  cloud: 
+    compatibility-verifier:
+      enabled: false
   zipkin:
     base-url: http://localhost:9411
   sleuth:
@@ -41,7 +46,7 @@ spring:
     topic:
       name: mail-sender-topic
     consumer:
-      bootstrap-servers: localhost:9092
+      bootstrap-servers: ${BROKER_URL}
       group-id: mail-sender
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer

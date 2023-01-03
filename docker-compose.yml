@@ -1,6 +1,5 @@
-version: '3.7'
+version: "3.7"
 services:
-
   zookeeper:
     image: confluentinc/cp-zookeeper:7.0.1
     container_name: zookeeper
@@ -8,72 +7,116 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
-  broker:
+  message-broker:
     image: confluentinc/cp-kafka:7.0.1
     container_name: broker
+    restart: always
     ports:
       - "9092:9092"
     depends_on:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
-  postgresql-db:
+  postgresql-auth-user-service:
     image: postgres
-    container_name: postgres-container
+    container_name: postgresql-auth-user-service
     restart: always
     environment:
       POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: swotlyzer-auth-service
     ports:
-      - '5432:5432'
+      - "5432:5432"
+
+  postgresql-mail-sender-service:
+    image: postgres
+    container_name: postgresql-mail-sender-service
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: swotlyzer-mail-sender
+      PGPORT: 5431
+      POSTGRES_PORT: 5431
+    ports:
+      - "5431:5431"
+
+  mongodb-swot-analysis-service:
+    image: mongo
+    restart: always
+    container_name: mongodb-swot-analysis-service
+    environment:
+      MONGO_INITDB_DATABASE: swotlyzer
+      # MONGO_INITDB_ROOT_USERNAME: root
+      # MONGO_INITDB_ROOT_PASSWORD: mongo
+    ports:
+      - "3000:3000"
 
   api-gateway:
-    build: './api-gateway'
-    container_name: api-gateway-container
+    build: "./api-gateway"
+    container_name: api-gateway
     restart: always
+    env_file:
+      - ./api-gateway/src/main/resources/docker.env
+    depends_on:
+      - discovery-server
     ports:
-      - '8080:8080'
+      - "8080:8080"
 
   discovery-server:
-    build: './discovery-server'
-    container_name: discovery-server-container
+    build: "./discovery-server"
+    container_name: discovery-server
     restart: always
     env_file:
       - ./discovery-server/src/main/resources/.env
     ports:
-      - '8761:8761'
+      - "8761:8761"
 
   mail-sender:
-    build: './mail-sender'
+    build: "./mail-sender"
     container_name: mail-sender-container
     restart: always
+    depends_on:
+      - postgresql-mail-sender-service
+      - discovery-server
+      - api-gateway
+      - message-broker
     env_file:
-      - ./mail-sender/src/main/resources/.env
+      - ./mail-sender/src/main/resources/docker.env
     ports:
-      - '8082'
+      - "8082"
 
-  api-core:
-    build: './api-core'
-    container_name: api-core-container
+  swot-analysis-service:
+    build: "./swot-analysis-service"
+    container_name: swot-analysis-service
     restart: always
+    depends_on:
+      - discovery-server
+      - mongodb-swot-analysis-service
+      - api-gateway
     env_file:
-      - ./api-core/src/main/resources/.env
+      - ./swot-analysis-service/src/main/resources/docker.env
     ports:
-      - '8083'
+      - "8083"
 
   auth-user-service:
-    build: './auth-user-service'
-    container_name: auth-user-service-container
+    build: "./auth-user-service"
+    container_name: auth-user-service
     restart: always
+    depends_on:
+      - postgresql-auth-user-service
+      - message-broker
+      - discovery-server
+      - api-gateway
     env_file:
-      - ./auth-user-service/src/main/resources/.env
+      - ./auth-user-service/src/main/resources/docker.env
     ports:
-      - '8083'
-
-
+      - "8081"
