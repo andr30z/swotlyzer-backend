@@ -19,6 +19,7 @@ management:
         include: "*"
 authentication:
   auth:
+    secureToken: ${SECURE_TOKEN:true}
     tokenExpirationMsec: ${TOKEN_EXPIRATION_MSEC}
     tokenSecret: ${TOKEN_SECRET}
     refreshTokenExpirationMsec: ${REFRESH_TOKEN_EXPIRATION_MSEC}
